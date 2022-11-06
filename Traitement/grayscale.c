@@ -133,10 +133,9 @@ int main(int argc, char** argv)
 
     SDL_Texture* grayt = SDL_CreateTextureFromSurface(renderer, s);
 
+    if(SDL_SaveBMP(s, "koukou.bmp"))
+        printf("ERROR: %s", SDL_GetError());
     SDL_FreeSurface(s);
-
-    event_loop(renderer, t, grayt);
-
     // Destroys the objects.
     SDL_DestroyRenderer(renderer);
     SDL_DestroyTexture(t);

@@ -169,6 +169,12 @@ double sigmoid_derivative(double z)
     return res * (1 - res);
 }
 
+void compute(layer **layer_list, matrix **W)
+{
+    for(size_t i = 0; i < 3; i++)
+        compute_next_layer(&layer_list[i], &W[i], &layer_list[i+1]);
+}
+
 void calculate_outputs(layer **layer_list, matrix **W, double **weighted_inputs,
         double *weighted_outputs)
 {
@@ -206,7 +212,7 @@ void calculate_hidden_values(double *neuron_values, matrix **W,
         for(size_t output_neuron = 0;
                 output_neuron < W[hidden_layer->depth]->length; outputNeuron++){
             hidden_value +=
-                mat_get(W[hidden_layer->depth], hidden_neuron, output_neuron)
+                mat_get(&W[hidden_layer->depth], hidden_neuron, output_neuron)
                 * neuron_values[output_neuron];
         }
 
@@ -233,10 +239,12 @@ void update_gradient(matrix **W, double **biases, layers *in_layer,
 void update_all_gradients(layers **input, matrix **W,
         double *expected_output, matrix **grad_w, double **grad_bias)
 {
-    double weighted_neurons[2][input[1]->neuron_size];
-    double weighted_outputs[input[3]->neuron_size];
-
+    double* weighted_1 = malloc(sizeof(double) * input[1]->neuron_size);
+    double* weighted_2 = malloc(sizeof(double) * input[1]->neuron_size);
+    double** weighted_neurons = {weighted_1, weighted_2};
+    double* weighted_outputs = malloc(sizeof(double) * input[3]->neuron_size);
     calculate_outputs(input, W, &weighted_neurons, &weighted_outputs);
+
     double neuron_values[input[3]->neuron_size];
     calculate_values(&input[3], &expected_output,
             &weighted_outputs, &neuron_values);
@@ -247,7 +255,7 @@ void update_all_gradients(layers **input, matrix **W,
     {
         double hidden_neuron_values[input[i]->neuron_size];
         calculate_hidden_values(&neuron_values, W[i-1], &input[i],
-                &weighted_neurons[i], &hidden_neuron_values);
+                &weighted_neurons[i-1], &hidden_neuron_values);
         update_gradient(&grad_w[i-1], &grad_bias[i-1],
                 &input[i-1], &input[i], &hidden_neuron_values);
     
@@ -283,5 +291,5 @@ void learn(layers **input_list, layers **layer_list, double learn_rate,
                 &grad_w, &grad_bias);
     }
 
-    apply_gradients(learn_rate / input);
+    apply_gradients(learn_rate / input, &layer_list, &W, &grad_w, &grad_bias);
 }

@@ -21,7 +21,8 @@ void event_loop(SDL_Renderer* renderer, SDL_Texture* colored, SDL_Texture* grays
 {
     SDL_Event event;
     SDL_Texture* t = colored;
-
+    t = grayscale;
+    draw(renderer, t);
     while (1)
     {
         SDL_WaitEvent(&event);
@@ -33,16 +34,6 @@ void event_loop(SDL_Renderer* renderer, SDL_Texture* colored, SDL_Texture* grays
             case SDL_WINDOWEVENT:
                 if(event.window.event == SDL_WINDOWEVENT_RESIZED)
                     draw(renderer, t);
-                break;
-
-            case SDL_KEYDOWN:
-                if (t == colored)
-                    t = grayscale;
-                else
-                    t = colored;
-
-                draw(renderer, t);
-
                 break;
 
         }
@@ -74,6 +65,12 @@ SDL_Surface* load_image(const char* path)
 //
 // pixel_color: Color of the pixel to convert in the RGB format.
 // format: Format of the pixel used by the surface.
+Uint8 f(Uint8 c, double n)
+{
+    if(c <= 255/2)
+        return (Uint8)((255/2)*SDL_pow((double)2*c/255,n));
+    return 255 - f(255-c,n);
+}
 Uint32 pixel_to_grayscale(Uint32 pixel_color, SDL_PixelFormat* format)
 {
     Uint8 r, g, b;
@@ -82,7 +79,14 @@ Uint32 pixel_to_grayscale(Uint32 pixel_color, SDL_PixelFormat* format)
 
     Uint32 average = 0.3*r + 0.59*g + 0.11*b;
 
-    return SDL_MapRGB(format, average, average, average);
+    r = average;
+    g = average;
+    b = average;
+    r = f(r,10);
+    g = f(g,10);
+    b = f(b,10);
+
+    return SDL_MapRGB(format, r, g, b);
 }
 
 void surface_to_grayscale(SDL_Surface* surface)
@@ -138,9 +142,9 @@ int main(int argc, char** argv)
 
     // Destroys the objects.
     SDL_DestroyRenderer(renderer);
-    SDL_DestroyTexture(grayt);
     SDL_DestroyTexture(t);
     SDL_DestroyWindow(window);
+    SDL_DestroyTexture(grayt);
     SDL_Quit();
 
 

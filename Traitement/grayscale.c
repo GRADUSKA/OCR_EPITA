@@ -1,7 +1,4 @@
-#include <err.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-
+#include "use.h"
 // Updates the display.
 //
 // renderer: Renderer to draw on.
@@ -44,22 +41,22 @@ void event_loop(SDL_Renderer* renderer, SDL_Texture* colored, SDL_Texture* grays
 // The format of the surface is SDL_PIXELFORMAT_RGB888.
 //
 // path:  the image.
-SDL_Surface* load_image(const char* path)
-{
-    SDL_Surface* tmp = IMG_Load(path);
-
-    if(tmp == NULL)
-        errx(EXIT_FAILURE, "%s", SDL_GetError());
-
-    SDL_Surface *res = SDL_ConvertSurfaceFormat(tmp, SDL_PIXELFORMAT_RGB888, 0);
-
-    if(res == NULL)
-        errx(EXIT_FAILURE, "%s", SDL_GetError());
-
-    SDL_FreeSurface(tmp);
-
-    return res;
-}
+//SDL_Surface* load_image(const char* path)
+//{
+//    SDL_Surface* tmp = IMG_Load(path);
+//
+//    if(tmp == NULL)
+//        errx(EXIT_FAILURE, "%s", SDL_GetError());
+//
+//    SDL_Surface *res = SDL_ConvertSurfaceFormat(tmp, SDL_PIXELFORMAT_RGB888, 0);
+//
+//    if(res == NULL)
+//        errx(EXIT_FAILURE, "%s", SDL_GetError());
+//
+//    SDL_FreeSurface(tmp);
+//
+//    return res;
+//}
 
 // Converts a colored pixel into grayscale.
 //

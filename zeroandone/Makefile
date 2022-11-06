@@ -18,5 +18,6 @@ zeroandone: zeroandone.o
 clean:
 	${RM} ${OBJ}
 	${RM} ${EXE}
+	${RM} *.txt
 
 # END

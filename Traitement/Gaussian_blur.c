@@ -27,12 +27,12 @@ Uint32* Convolution(SDL_Surface* surface)
                     int _j_ = j + l -2;
                     if(_i_ < 0)
                         _i_ =0;
-                    if (_i_ >= surface->w)
-                        _i_ = surface->w-1;
+                    if (_i_ >= surface->h)
+                        _i_ = surface->h-1;
                     if(_j_ < 0)
                         _j_ =0;
-                    if (_j_ >= surface->h)
-                        _j_ = surface->h-1;
+                    if (_j_ >= surface->w)
+                        _j_ = surface->w-1;
                     Uint8 r,g,b;
                     SDL_GetRGB(pixels[_i_ * surface->w + _j_], surface->format
                             , &r,&g,&b);

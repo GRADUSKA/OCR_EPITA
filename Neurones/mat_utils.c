@@ -31,12 +31,12 @@ void mat_add(matrix *mat1, matrix *mat2)
 
 double* mat_mult(matrix *mat, double *list)
 {
-    double res[mat->length];
+    double *res = malloc(mat->length);
 
     for(size_t i = 0; i < mat->length; i++){
         for(size_t j = 0; j < mat->width; j++){
 
-            res[i] = mat_get(mat, i, j) * list[j];
+            res[i] += mat_get(mat, i, j) * list[j];
         }
     }
     return res;

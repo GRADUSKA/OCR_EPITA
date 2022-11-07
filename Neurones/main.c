@@ -110,9 +110,54 @@ void write_neuron(FILE *file, layer **layer_list, matrix **W)
     {
         for(size_t i = 0; i < W[num]->width * W[num]->length; i++)
         {
-            while()
+            double value = W[num]->mat[i];
+            if(value == 0)
+            {
+                fputc(&p, '0');
+                p++;
+            }
+            else
+            {
+                while(((int) value) != value)
+                {
+                    value *= 10;
+                    fputc(&p, ((int) value) % 10 + '0');
+                    p++;
+                }
+            }
+            fputc(&p, ' ');
+            p++;
         }
+        fputc(&p, '\n');
+        p++;
     }
+    for(size_t num = 1; num < 4; num++)
+    {
+        for(size_t i = 0; i < layer_list[num]->neuron_size; i++)
+        {
+            double value = layer_list[num]->biases[i];
+            if(value == 0)
+            {
+                fputc(&p, '0');
+                p++;
+            }
+            else
+            {
+                while(((int) value) != value)
+                {
+                    value *= 10;
+                    fputc(&p, ((int) value) % 10 + '0');
+                    p++;
+                }
+            }
+            fputc(&p, ' ');
+            p++;
+        }
+        fputc(&p, '\n');
+        p++;
+    }
+    fputc(&p, '\0');
+
 }
 
 void main(size_t argc, char** argv)
@@ -204,8 +249,7 @@ void main(size_t argc, char** argv)
             learn(&input_list, &layer_list, 0.1, &expected_outputs, &W, 4);
 
         neuron_file = fopen(argv[2], "w");
-
-        // ecrire dans le fichier
+        write_neuron(&neuron_file, &layer_list, &W);
     }
     else
     {

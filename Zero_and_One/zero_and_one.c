@@ -13,13 +13,13 @@ int which(int c, Uint32* pixels, SDL_PixelFormat* format, int x, int y)
         {
             Uint8 r, g, b;
             SDL_GetRGB(pixels[c+q+16*p], format, &r, &g, &b);
-            if(r == 0 && g == 0 && b == 0)
+            if(r == 255 && g == 255 && b == 255)
             {
-                noir++;
+                blanc++;
             }
             else
             {
-                blanc++;
+                noir++;
             }
         }
     }

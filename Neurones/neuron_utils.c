@@ -22,10 +22,10 @@ double get_neuron(layers *layer, size_t i)
 
 void init_layers(layers **layer_list, size_t *sizes)
 {
-    layers *input_layer;
-    layers *hidden_layer1;
-    layers *hidden_layer2;
-    layers *output_layer;
+    layers *input_layer = malloc(sizeof(layers));
+    layers *hidden_layer1 = malloc(sizeof(layers));
+    layers *hidden_layer2 = malloc(sizeof(layers));
+    layers *output_layer = malloc(sizeof(layers));
 
     double *in_list = calloc(sizes[0], sizeof(double));
     double *hid_list1 = calloc(sizes[1], sizeof(double));
@@ -234,7 +234,7 @@ void update_gradient(matrix **W, double **biases, layers *in_layer,
             W[in_layer->depth]->mat[out * W[in_layer->depth]->width + in] +=
                 in_layer->neurons[in] * neuron_values[out];
         }
-        biases[in_layer->depth][out] += neuron_values[out];
+        biases[in_layer->depth][out] += out_layer->biases[out];
     }
 }
 

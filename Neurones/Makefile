@@ -2,19 +2,21 @@
 
 CC = gcc
 CPPFLAGS =
-CFLAGS = -Wall -Wextra -O3 -lm
+CFLAGS = -g -Wall -Wextra -O3 -lm
 LDFLAGS =
-LDLIBS =
 
 all: main
 
-main: 
-	$(CC) -c $(SRC)
-	$(CC) -o $(CFLAGS) $(OBJ)
-
 SRC = neuron_utils.c mat_utils.c main.c
 OBJ = ${SRC:.c=.o}
-EXE = ${main.c:.c=}
+EXE = ${SRC:.c=}
+
+
+main: $(OBJ)
+	$(CC) $(CFLAGS) $^ -o $@
+
+%.o: %.c
+	$(CC) $(CFLAGS) $< -o $@
 
 .PHONY: clean
 

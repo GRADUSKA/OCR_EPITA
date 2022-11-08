@@ -8,6 +8,7 @@ typedef struct{
     size_t width;
     double* mat;
 } matrix;
+
 double mat_get(matrix *mat, size_t i, size_t j);
 void mat_set(matrix *mat, size_t i, size_t j, double value);
 void mat_add(matrix *mat1, matrix *mat2);

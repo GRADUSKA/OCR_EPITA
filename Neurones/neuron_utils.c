@@ -123,15 +123,12 @@ double get_bias(layers *layer, size_t i)
     return *(layer->biases + i);
 }
 
-double* weight_inputs(matrix *W, layers *layer)
+void weight_inputs(matrix *W, layers *in_layer, layers *out_layer)
 {
-    double *res = calloc(W->length, sizeof(double));
     for(size_t out = 0; out < W->length; out++){
         for(size_t in = 0; in < W->width; in++)
-            *(res + out) += get_neuron(layer, in) * mat_get(W, out, in);
+            out_layer->neurons[out] += get_neuron(in_layer, in) * mat_get(W, out, in);
     }
-
-    return res;
 }
 
 void bias_neurons_and_sigmoid(layers *layer)
@@ -167,7 +164,7 @@ double cost_derivative(size_t output_change, layers *layer,
 double sigmoid_derivative(double z)
 {
     double res = 1. / (1. + (double)exp(-z));
-    return res * (1 - res);
+    return res * (1. - res);
 }
 
 void compute(layers **layer_list, matrix **W)
@@ -181,12 +178,11 @@ void calculate_outputs(layers **layer_list, matrix **W, double **weighted_inputs
 {
     for(size_t i = 0; i < 2; i++)
     {
-        layer_list[i+1]->neurons = weight_inputs(W[i], layer_list[i]);
+        weight_inputs(W[i], layer_list[i], layer_list[i+1]);
         copy_neurons(layer_list[i+1], weighted_inputs[i]);
         bias_neurons_and_sigmoid(layer_list[i+1]);
     }
-
-    layer_list[3]->neurons = weight_inputs(W[2], layer_list[2]);
+    weight_inputs(W[2], layer_list[2], layer_list[3]);
     copy_neurons(layer_list[3], weighted_outputs);
     bias_neurons_and_sigmoid(layer_list[3]);
 }

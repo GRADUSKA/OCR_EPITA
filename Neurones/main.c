@@ -251,7 +251,7 @@ int main(int argc, char** argv)
         expected_outputs[2] = output_3;
         expected_outputs[3] = output_4;
 
-        for(size_t i = 0; i < 50; i++)
+        for(size_t i = 0; i < 500; i++)
             learn(input_list, layer_list, 0.1, expected_outputs, W, 4);
 
         neuron_file = fopen(argv[2], "w");

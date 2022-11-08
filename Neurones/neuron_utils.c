@@ -13,8 +13,6 @@ typedef struct{
     double* biases;
 } layers;
 
-double diff = 0.0001;
-
 double get_neuron(layers *layer, size_t i)
 {
     return *((layer->neurons) + i);
@@ -37,12 +35,12 @@ void init_layers(layers **layer_list, size_t *sizes)
     double *b3 = malloc(sizes[2] * sizeof(double));
 
     for(size_t out = 0; out < sizes[1]; out++){
-        *(b1 + out) = rand() / RAND_MAX;
-        *(b2 + out) = rand() / RAND_MAX;
+        *(b1 + out) = (double)rand() / (double)RAND_MAX;
+        *(b2 + out) = (double)rand() / (double)RAND_MAX;
     }
 
     for(size_t out = 0; out < sizes[2]; out++){
-        *(b3 + out) = rand() / RAND_MAX;
+        *(b3 + out) = (double)rand() / (double)RAND_MAX;
     }
 
     input_layer->depth = 0;
@@ -80,7 +78,8 @@ void init_weight(double *w, size_t *sizes, size_t i)
     for(size_t length = 0; length < *(sizes + ((i + 1) / 2)); length++){
         for(size_t width = 0; width < *(sizes + i / 2); width++)
         {
-            w[length * (*(sizes + i / 2)) + width] = rand() / RAND_MAX;
+            w[length * (*(sizes + i / 2)) + width] =
+                (double)rand() / (double)RAND_MAX;
         }
     }
 }
@@ -167,7 +166,7 @@ double cost_derivative(size_t output_change, layers *layer,
 
 double sigmoid_derivative(double z)
 {
-    double res = 1. / (1. + exp(-z));
+    double res = 1. / (1. + (double)exp(-z));
     return res * (1 - res);
 }
 
@@ -225,7 +224,7 @@ void calculate_hidden_values(double *neuron_values, matrix **W,
 /* a revoir */
 
 void update_gradient(matrix **W, double **biases, layers *in_layer,
-        layers *out_layer, double *neuron_values)
+        double *neuron_values)
 {
     for(size_t out = 0; out < W[in_layer->depth]->length; out++)
     {
@@ -234,7 +233,7 @@ void update_gradient(matrix **W, double **biases, layers *in_layer,
             W[in_layer->depth]->mat[out * W[in_layer->depth]->width + in] +=
                 in_layer->neurons[in] * neuron_values[out];
         }
-        biases[in_layer->depth][out] += out_layer->biases[out];
+        biases[in_layer->depth][out] += neuron_values[out];
     }
 }
 
@@ -250,19 +249,21 @@ void update_all_gradients(layers **input, matrix **W,
     double* weighted_outputs = malloc(sizeof(double) * input[3]->neuron_size);
     calculate_outputs(input, W, weighted_neurons, weighted_outputs);
 
-    double neuron_values[input[3]->neuron_size];
+    double *neuron_values = malloc(sizeof(double) * input[3]->neuron_size);
     calculate_values(input[3], expected_output,
             weighted_outputs, neuron_values);
     update_gradient(grad_w, grad_bias,
-            input[2], input[3], neuron_values);
-
+            input[2], neuron_values);
     for(size_t i = 2; i > 0; i--)
     {
-        double hidden_neuron_values[input[i]->neuron_size];
+        double *hidden_neuron_values = 
+            calloc(sizeof(double), input[i]->neuron_size);
         calculate_hidden_values(neuron_values, W, input[i],
                 weighted_neurons[i-1], hidden_neuron_values);
         update_gradient(grad_w, grad_bias,
-                input[i-1], input[i], hidden_neuron_values);
+                input[i-1], hidden_neuron_values);
+        neuron_values = malloc(sizeof(double) * input[i]->neuron_size);
+        neuron_values = hidden_neuron_values;
     }
 }
 
@@ -275,9 +276,12 @@ void apply_gradients(double learn_rate, layers **layer, matrix **W,
         {
             for(size_t in = 0; in < layer[i]->neuron_size; in++)
             {
+                //printf("weights %lu [%lu][%lu] = %f\n",
+                  //      i, out, in, grad_w[i]->mat[out * W[i]->width + in]);
                 W[i]->mat[out * W[i]->width + in] -=
                     grad_w[i]->mat[out * W[i]->width + in] * learn_rate;
             }
+            //printf("biases %lu [%lu] = %f\n", i+1, out, grad_bias[i][out]);
             layer[i+1]->biases[out] -= grad_bias[i][out] * learn_rate;
         }
     }
@@ -302,7 +306,8 @@ void learn(layers **input_list, layers **layer_list, double learn_rate,
     while(input < input_number)
     {
         layer_list[0] = input_list[input];
-        printf("input = %f %f\n", layer_list[0]->neurons[0], layer_list[0]->neurons[1]);
+        printf("input = %i %i\n",
+                (int)layer_list[0]->neurons[0], (int)layer_list[0]->neurons[1]);
         update_all_gradients(layer_list, W, expected_outputs[input],
                 grad_w, grad_bias);
         size_t max = 0;
@@ -311,5 +316,5 @@ void learn(layers **input_list, layers **layer_list, double learn_rate,
         printf("result = %lu\npercentage = %f\n", max, layer_list[3]->neurons[max]);
         input += 1;
     }
-    apply_gradients(learn_rate / input, layer_list, W, grad_w, grad_bias);
+    apply_gradients(learn_rate, layer_list, W, grad_w, grad_bias);
 }

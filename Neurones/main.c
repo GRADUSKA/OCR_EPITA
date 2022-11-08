@@ -45,7 +45,6 @@ void read_neuron(FILE *file, layers **layer_list, matrix **W)
             {
                 value = 10 * value + c - '0';
                 div *= 10;
-                i++;
                 c = fgetc(file + i);
             }
             if(c == ' ')
@@ -112,53 +111,49 @@ void write_neuron(FILE *file, layers **layer_list, matrix **W)
         for(size_t i = 0; i < W[num]->width * W[num]->length; i++)
         {
             double value = W[num]->mat[i];
-            if(value == 0)
+            if(value == 0.)
             {
                 fputc('0', p);
-                p++;
             }
             else
             {
-                while(((int) value) != value)
+                size_t j = 0;
+                while(j < 5)
                 {
                     value *= 10;
                     fputc(((int) value) % 10 + '0', p);
-                    p++;
+                    j++;
                 }
             }
+            
             fputc(' ', p);
-            p++;
         }
         fputc('\n', p);
-        p++;
     }
     for(size_t num = 1; num < 4; num++)
     {
         for(size_t i = 0; i < layer_list[num]->neuron_size; i++)
         {
             double value = layer_list[num]->biases[i];
-            if(value == 0)
+            if(value == 0.)
             {
                 fputc('0', p);
-                p++;
             }
             else
             {
-                while(((int) value) != value)
+                size_t j = 0;
+                while(j < 5)
                 {
                     value *= 10;
                     fputc(((int) value) % 10 + '0', p);
-                    p++;
+                    j++;
                 }
             }
             fputc(' ', p);
-            p++;
         }
         fputc('\n', p);
-        p++;
     }
     fputc('\0', p);
-
 }
 
 int main(int argc, char** argv)
@@ -256,7 +251,7 @@ int main(int argc, char** argv)
         expected_outputs[2] = output_3;
         expected_outputs[3] = output_4;
 
-        for(size_t i = 0; i < 2; i++)
+        for(size_t i = 0; i < 50; i++)
             learn(input_list, layer_list, 0.1, expected_outputs, W, 4);
 
         neuron_file = fopen(argv[2], "w");

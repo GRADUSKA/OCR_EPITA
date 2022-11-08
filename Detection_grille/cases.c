@@ -1,7 +1,4 @@
-#include <err.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-
+#include "use.h"
 
 void to_case(SDL_Surface* surface, int list_coor[],  SDL_Renderer* renderer)
 {

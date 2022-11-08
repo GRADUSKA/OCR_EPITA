@@ -1,6 +1,6 @@
 #include "mat_utils.h"
-#include "stdlib.h"
-#include "stdio.h"
+#include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
 
 /* neuron_utils.c */
@@ -22,10 +22,10 @@ double get_neuron(layers *layer, size_t i)
 
 void init_layers(layers **layer_list, size_t *sizes)
 {
-    layers *input_layer;
-    layers *hidden_layer1;
-    layers *hidden_layer2;
-    layers *output_layer;
+    layers *input_layer = malloc(sizeof(layers));
+    layers *hidden_layer1 = malloc(sizeof(layers));
+    layers *hidden_layer2 = malloc(sizeof(layers));
+    layers *output_layer = malloc(sizeof(layers));
 
     double *in_list = calloc(sizes[0], sizeof(double));
     double *hid_list1 = calloc(sizes[1], sizeof(double));
@@ -167,7 +167,7 @@ double cost_derivative(size_t output_change, layers *layer,
 
 double sigmoid_derivative(double z)
 {
-    double res = 1 / (1 + exp(-z));
+    double res = 1. / (1. + exp(-z));
     return res * (1 - res);
 }
 
@@ -234,7 +234,7 @@ void update_gradient(matrix **W, double **biases, layers *in_layer,
             W[in_layer->depth]->mat[out * W[in_layer->depth]->width + in] +=
                 in_layer->neurons[in] * neuron_values[out];
         }
-        biases[in_layer->depth][out] += neuron_values[out];
+        biases[in_layer->depth][out] += out_layer->biases[out];
     }
 }
 
@@ -287,13 +287,13 @@ void learn(layers **input_list, layers **layer_list, double learn_rate,
 {
     size_t input = 0;
     matrix **grad_w = malloc(sizeof(matrix) * 3);
-    double **grad_bias = 
+    double **grad_bias =
         malloc((sizeof(double) * layer_list[1]->neuron_size) * 3);
     for(size_t i = 0; i < 3; i++)
     {
-        matrix *m = calloc(sizeof(matrix));
+        matrix *m = calloc(sizeof(matrix),1);
         grad_w[i] = m;
-        double *b = calloc(sizeof(double) * layer_list[1]->neuron_size);
+        double *b = calloc(sizeof(double) ,layer_list[1]->neuron_size);
         grad_bias[i] = b;
     }
 

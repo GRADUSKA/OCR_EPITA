@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <err.h>
+#include <math.h>
 #include "neuron_utils.h"
 #include "mat_utils.h"
 

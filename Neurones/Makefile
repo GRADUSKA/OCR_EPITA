@@ -1,22 +1,20 @@
 # Makefile
 
 CC = gcc
-CPPFLAGS =
-CFLAGS = -g -Wall -Wextra -O3 -lm
-LDFLAGS =
+CFLAGS = -g -Wall -Wextra -O3 
 
 all: main
 
 SRC = neuron_utils.c mat_utils.c main.c
 OBJ = ${SRC:.c=.o}
-EXE = ${SRC:.c=}
+EXE = main
 
 
 main: $(OBJ)
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@ -lm
 
 %.o: %.c
-	$(CC) $(CFLAGS) $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@ -lm
 
 .PHONY: clean
 

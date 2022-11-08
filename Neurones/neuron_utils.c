@@ -167,7 +167,7 @@ double cost_derivative(size_t output_change, layers *layer,
 
 double sigmoid_derivative(double z)
 {
-    double res = 1 / (1 + exp(-z));
+    double res = 1. / (1. + exp(-z));
     return res * (1 - res);
 }
 

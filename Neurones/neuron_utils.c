@@ -269,12 +269,14 @@ void update_all_gradients(layers **input, matrix **W,
 void apply_gradients(double learn_rate, layers **layer, matrix **W,
         matrix **grad_w, double **grad_bias)
 {
+    printf("test 0\n");
     for (size_t i = 0; i < 3; i++)
     {
+        printf("test %lu", i+1);
         for(size_t out = 0; out < layer[i+1]->neuron_size; out++){
             for(size_t in = 0; in < layer[i]->neuron_size; in++){
                 W[i]->mat[out * W[i]->width + in] -= 
-                    grad_w[i]->mat[out * grad_w[i]->width + in] * learn_rate;
+                    grad_w[i]->mat[out * W[i]->width + in] * learn_rate;
             }
             layer[i+1]->biases[out] -= grad_bias[i][out] * learn_rate;
         }
@@ -300,8 +302,14 @@ void learn(layers **input_list, layers **layer_list, double learn_rate,
     while(input < input_number)
     {
         layer_list[0] = input_list[input];
+        printf("input = %f %f\n", layer_list[0]->neurons[0], layer_list[0]->neurons[1]);
         update_all_gradients(layer_list, W, expected_outputs[input],
                 grad_w, grad_bias);
+        size_t max = 0;
+        if(layer_list[3]->neurons[1] > layer_list[3]->neurons[0])
+            max = 0;
+        printf("result = %lu\npercentage = %f\n", max, layer_list[3]->neurons[max]);
+        input++;
     }
 
     apply_gradients(learn_rate / input, layer_list, W, grad_w, grad_bias);

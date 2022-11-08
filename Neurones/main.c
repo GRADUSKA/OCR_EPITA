@@ -27,7 +27,7 @@ void init_xor(layers **input_list)
     }
 }
 
-void read_neuron(FILE *file, layers **layer_list, matrix **W, size_t *sizes)
+void read_neuron(FILE *file, layers **layer_list, matrix **W)
 {
     size_t i = 0;
     size_t div = 1;
@@ -192,14 +192,14 @@ int main(int argc, char** argv)
     neuron_file = fopen(argv[2], "r");
     if(neuron_file != NULL)
     {
-        read_neuron(neuron_file, layer_list, W, sizes);
+        read_neuron(neuron_file, layer_list, W);
         fclose(neuron_file);
     }
 
     if(argv[1][0] == 'x' && argc == 5)
     {
-        if(argv[3][0] != '0' && argv[3][0] != '1' 
-                || argv[4][0] != '0' && argv[4][0] != '0')
+        if((argv[3][0] != '0' && argv[3][0] != '1')
+                || (argv[4][0] != '0' && argv[4][0] != '0'))
             exit_help();
         layer_list[0]->neurons[0] = argv[3][0]-'0';
         layer_list[0]->neurons[1] = argv[4][0]-'0';
@@ -211,7 +211,7 @@ int main(int argc, char** argv)
                 argv[3][0]-'0', argv[4][0]-'0',
                 max, layer_list[3]->neurons[max]);
     }
-    else if(argc == 4)
+    else if(argv[1][0] == 'd' && argc == 4)
     {
         FILE* data_file = NULL;
         data_file = fopen(argv[3], "r");
@@ -256,7 +256,7 @@ int main(int argc, char** argv)
         expected_outputs[2] = output_3;
         expected_outputs[3] = output_4;
 
-        for(size_t i = 0; i < 1; i++)
+        for(size_t i = 0; i < 2; i++)
             learn(input_list, layer_list, 0.1, expected_outputs, W, 4);
 
         neuron_file = fopen(argv[2], "w");

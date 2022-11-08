@@ -2,7 +2,7 @@
 
 CC = gcc
 CPPFLAGS =
-CFLAGS = -Wall -Wextra -O3
+CFLAGS = -Wall -Wextra -O3 -lm
 LDFLAGS =
 LDLIBS =
 
@@ -12,7 +12,7 @@ main:
 	$(CC) -c $(SRC)
 	$(CC) -o $(CFLAGS) $(OBJ)
 
-SRC = neuron_utils.c mat_utils.c
+SRC = neuron_utils.c mat_utils.c main.c
 OBJ = ${SRC:.c=.o}
 EXE = ${main.c:.c=}
 

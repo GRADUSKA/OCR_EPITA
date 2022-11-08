@@ -1,6 +1,6 @@
 #include "mat_utils.h"
-#include "stdlib.h"
-#include "stdio.h"
+#include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
 
 /* neuron_utils.c */
@@ -287,13 +287,13 @@ void learn(layers **input_list, layers **layer_list, double learn_rate,
 {
     size_t input = 0;
     matrix **grad_w = malloc(sizeof(matrix) * 3);
-    double **grad_bias = 
+    double **grad_bias =
         malloc((sizeof(double) * layer_list[1]->neuron_size) * 3);
     for(size_t i = 0; i < 3; i++)
     {
-        matrix *m = calloc(sizeof(matrix));
+        matrix *m = calloc(sizeof(matrix),1);
         grad_w[i] = m;
-        double *b = calloc(sizeof(double) * layer_list[1]->neuron_size);
+        double *b = calloc(sizeof(double) ,layer_list[1]->neuron_size);
         grad_bias[i] = b;
     }
 

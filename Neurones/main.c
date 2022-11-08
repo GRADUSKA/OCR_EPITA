@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <stdlin.h>
+#include <stdlib.h>
 #include <string.h>
 #include <err.h>
 #include "neuron_utils.h"

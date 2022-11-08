@@ -70,16 +70,29 @@ double* gradiants(SDL_Surface *surface)
         if (nb > max)
             max = nb;
     }
+
     for(int i = 0; i < size;i++)
     {
         res[i] = res[i]/max * 255;
         res[i]= res[i] > 255 ? 255 : res[i];
         res[i] = res[i] < 0 ? 0 : res[i];
     }
+
     free(pixelsX);
     free(pixelsY);
     return res;
 }
+
+double* direction_grad(int* Gx, int* Gy, int size)
+{
+    double* theta = malloc(sizeof(double) * size);
+    for(int i =0; i< size;i++)
+    {
+        theta[i] = atan2(Gy[i],Gx[i]);
+    }
+    return theta;
+}
+
 void ApplySobel(SDL_Surface *surface)
 {
     double* graduska= gradiants(surface);
@@ -91,8 +104,65 @@ void ApplySobel(SDL_Surface *surface)
     {
         res[i] = SDL_MapRGB(surface -> format,graduska[i],graduska[i],graduska[i]);
     }
+
     SDL_UnlockSurface(surface);
     free(graduska);
+}
+
+double* non_max_suppr(SDL_Surface *surface, double* theta)
+{
+    int size = surface->w * surface->h;
+    Uint32* pixels = surface->pixels;
+    double* res = malloc(sizeof(double) * size);
+    for(int i = 0 ; i < size;i++)
+    {
+        theta[i] = theta[i]*180. / M_PI;
+        if(theta[i] < 0)
+            theta[i]+=180;
+    }
+
+    for(int i = 0; i < surface->h; i++)
+    {
+        for(int j = 0;j < surface->w;j++)
+        {
+            int q = 255;
+            int r = 255;
+
+            int cell = i*surface->w+j;
+
+            if((0 <= theta[cell] && theta[cell] < 22.5) || (157.5 <= theta[cell]
+                    && theta[cell] <= 180))
+            {
+                q = pixels[cell+1];
+                r = pixels[cell-1];
+            }
+
+
+            else if(22.5 <= theta[cell] && theta[cell] < 67.5)
+            {
+                q = pixels[(i+1)*surface->w +j-1];
+                r = pixels[(i-1)*surface->w +j+1];
+            }
+
+            else if(67.5 <= theta[cell] && theta[cell] < 112.5)
+            {
+                q = pixels[(i+1)*surface->w +j];
+                r = pixels[(i-1)*surface->w +j];
+            }
+
+            else if(112.5 <= theta[cell] && theta[cell] < 157.5)
+            {
+                q = pixels[(i-1)*surface->w + j - 1];
+                r = pixels[(i+1)*surface->w + j + 1];
+            }
+
+            if((int)pixels[cell] >= q && (int)pixels[cell] >= r)
+                res[cell] = (double)pixels[cell];
+            else
+                res[cell] = 0;
+        }
+    }
+    return res;
 }
 
 int main(int argc, char** argv)
@@ -103,9 +173,19 @@ int main(int argc, char** argv)
 
     SDL_Surface* s = load_image(argv[1]);
 
-    ApplySobel(s);
+    double* theta = direction_grad(Convolution(s,Kx), Convolution(s,Ky),
+            s->w*s->h);
 
-    SDL_SaveBMP(s, "test_Sobel_blur.bmp");
+    ApplySobel(s);
+    double* nms = non_max_suppr(s,theta);
+    Uint32* pixels = s->pixels;
+    SDL_LockSurface(s);
+    for(int i = 0 ;i < s->w*s->h;i++)
+    {
+        pixels[i]= SDL_MapRGB(s->format, nms[i],nms[i],nms[i]);
+    }
+    SDL_UnlockSurface(s);
+    SDL_SaveBMP(s, "test_canny.bmp");
 
     SDL_FreeSurface(s);
 

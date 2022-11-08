@@ -229,7 +229,7 @@ int main(int argc, char** argv)
         fclose(data_file);
         compute(layer_list, W);
         size_t max = 0;
-        for(size_t i = 1; i < sizes[3]; i++)
+        for(size_t i = 1; i < sizes[2]; i++)
             if(layer_list[3]->neurons[i] > layer_list[3]->neurons[max])
                 max = i;
         printf("Result: %lu\nPercentage: %f", max + 1, layer_list[3]->neurons[max]);
@@ -246,7 +246,7 @@ int main(int argc, char** argv)
         input_list[2] = input_3;
         input_list[3] = input_4;
         init_xor(input_list);
-        double output_1[] = {1, 0}; 
+        double output_1[] = {1, 0};
         double output_2[] = {0, 1};
         double output_3[] = {0, 1};
         double output_4[] = {1, 0};
@@ -267,7 +267,7 @@ int main(int argc, char** argv)
         // a faire:
         // - Lire le fichier de données
         // - Faire 2 listes, les input et les resultats
-        // - Learn sur tous   
+        // - Learn sur tous
     }
 
     return 1;

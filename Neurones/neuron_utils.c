@@ -243,7 +243,7 @@ void update_all_gradients(layers **input, matrix **W,
 {
     double* weighted_1 = malloc(sizeof(double) * input[1]->neuron_size);
     double* weighted_2 = malloc(sizeof(double) * input[1]->neuron_size);
-    double** weighted_neurons = 
+    double** weighted_neurons =
         malloc((sizeof(double) * input[1]->neuron_size) * 2);
     weighted_neurons[0] = weighted_1;
     weighted_neurons[1] = weighted_2;
@@ -269,15 +269,13 @@ void update_all_gradients(layers **input, matrix **W,
 void apply_gradients(double learn_rate, layers **layer, matrix **W,
         matrix **grad_w, double **grad_bias)
 {
-    printf("test 0");
     for(size_t i = 0; i < 3; i++)
     {
-        printf("test");
         for(size_t out = 0; out < layer[i+1]->neuron_size; out++)
         {
             for(size_t in = 0; in < layer[i]->neuron_size; in++)
             {
-                W[i]->mat[out * W[i]->width + in] -= 
+                W[i]->mat[out * W[i]->width + in] -=
                     grad_w[i]->mat[out * W[i]->width + in] * learn_rate;
             }
             layer[i+1]->biases[out] -= grad_bias[i][out] * learn_rate;
@@ -296,11 +294,11 @@ void learn(layers **input_list, layers **layer_list, double learn_rate,
     for(size_t i = 0; i < 3; i++)
     {
         matrix *m = calloc(sizeof(matrix),1);
+        m->mat = calloc(sizeof(double), (W[i]->width * W[i]->length));
         grad_w[i] = m;
-        double *b = calloc(sizeof(double) ,layer_list[1]->neuron_size);
+        double *b = calloc(sizeof(double), layer_list[1]->neuron_size);
         grad_bias[i] = b;
     }
-    printf("iteration number = %lu\n" , input_number);
     while(input < input_number)
     {
         layer_list[0] = input_list[input];
@@ -312,8 +310,6 @@ void learn(layers **input_list, layers **layer_list, double learn_rate,
             max = 0;
         printf("result = %lu\npercentage = %f\n", max, layer_list[3]->neurons[max]);
         input += 1;
-        printf("iteration = %lu\n", input);
     }
-    printf("test sivouplai");
     apply_gradients(learn_rate / input, layer_list, W, grad_w, grad_bias);
 }

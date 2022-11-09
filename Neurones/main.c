@@ -17,15 +17,33 @@ void exit_help()
 
 void init_xor(layers **input_list)
 {
-    for(size_t i = 0; i < 4; i++)
-    {
-        double* neuron = malloc(sizeof(double) * 2);
-        neuron[0] = i/2;
-        neuron[1] = (i+1)/2 - (i/3)*2;
-        input_list[i]->depth = 0;
-        input_list[i]->neurons = neuron;
-        input_list[i]->neuron_size = 2;
-    }
+        double* neuron_1 = malloc(sizeof(double) * 2);
+        neuron_1[0] = 0;
+        neuron_1[1] = 0;
+        input_list[0]->depth = 0;
+        input_list[0]->neurons = neuron_1;
+        input_list[0]->neuron_size = 2;
+
+        double* neuron_2 = malloc(sizeof(double) * 2);
+        neuron_2[0] = 0;
+        neuron_2[1] = 1;
+        input_list[1]->depth = 0;
+        input_list[1]->neurons = neuron_2;
+        input_list[1]->neuron_size = 2;
+
+        double* neuron_3 = malloc(sizeof(double) * 2);
+        neuron_3[0] = 1;
+        neuron_3[1] = 0;
+        input_list[2]->depth = 0;
+        input_list[2]->neurons = neuron_3;
+        input_list[2]->neuron_size = 2;
+
+        double* neuron_4 = malloc(sizeof(double) * 2);
+        neuron_4[0] = 1;
+        neuron_4[1] = 1;
+        input_list[3]->depth = 0;
+        input_list[3]->neurons = neuron_4;
+        input_list[3]->neuron_size = 2;
 }
 
 void read_neuron(FILE *file, layers **layer_list, matrix **W)
@@ -254,8 +272,12 @@ int main(int argc, char** argv)
         expected_outputs[2] = output_3;
         expected_outputs[3] = output_4;
 
-        for(size_t i = 0; i < 500; i++)
-            learn(input_list, layer_list, 0.01, expected_outputs, W, 4);
+        for(size_t i = 0; i < 4; i++)
+        {
+            printf("------------------------------------------------\n");
+            learn(input_list, layer_list, 0.004, expected_outputs, W, 4);
+            printf("\n");
+        }
 
         neuron_file = fopen(argv[2], "w");
         write_neuron(neuron_file, layer_list, W);

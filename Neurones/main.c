@@ -275,7 +275,7 @@ int main(int argc, char** argv)
         for(size_t i = 0; i < 100000000; i++)
         {
             printf("------------------------------------------------\n");
-            learn(input_list, layer_list, 0.04, expected_outputs, W, 4);
+            learn(input_list, layer_list, 0.15, expected_outputs, W, 4);
             printf("\n");
         }
 

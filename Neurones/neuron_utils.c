@@ -35,12 +35,12 @@ void init_layers(layers **layer_list, size_t *sizes)
     double *b3 = malloc(sizes[2] * sizeof(double));
 
     for(size_t out = 0; out < sizes[1]; out++){
-        b1[out] = 3. * ((double)rand() + (double)rand()) / ((double)RAND_MAX);
-        b2[out] = 3. * ((double)rand() + (double)rand()) / ((double)RAND_MAX);
+        b1[out] = 2. * ((double)rand() + (double)rand()) / ((double)RAND_MAX);
+        b2[out] = 2. * ((double)rand() + (double)rand()) / ((double)RAND_MAX);
     }
 
     for(size_t out = 0; out < sizes[2]; out++){
-        b3[out] = 3. * ((double)rand() + (double)rand()) / ((double)RAND_MAX);
+        b3[out] = 2. * ((double)rand() + (double)rand()) / ((double)RAND_MAX);
     }
 
     input_layer->depth = 0;
@@ -79,7 +79,7 @@ void init_weight(double *w, size_t *sizes, size_t i)
         for(size_t width = 0; width < *(sizes + i / 2); width++)
         {
             w[length * (*(sizes + i / 2)) + width] =
-                3. * ((double)rand() + (double)rand()) / ((double)RAND_MAX);
+                2. * ((double)rand() + (double)rand()) / ((double)RAND_MAX);
         }
     }
 }

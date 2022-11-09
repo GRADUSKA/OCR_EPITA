@@ -13,19 +13,21 @@ void foreach_pixels(Uint32 pixel_color, SDL_PixelFormat* format,
         for(float t = 0; t < 180; t++)
         {
             int r = x * cos((t* M_PI)/180) + y * sin((t* M_PI)/180);
-            tab[r*360+t]+=1;
+            size_t c = (size_t)r*360+t;
+            tab[c] = tab[c] + 1;
         }
     }
 }
 
-double* hough_function(SDL_Surface* surface, int* w, int* h)
+double* hough_function(SDL_Surface* surface, int w, int h)
 {
     // Take the weight and height of my pixels
     Uint32* pixels = surface->pixels;
-    *w = surface->w;
-    *h = surface->h;
+    w = surface->w;
+    h = surface->h;
 
-    double* tab = calloc(sizeof(double),360*sqrt((w*w)+(h*h)));
+    int taille = 360*sqrt((w*w)+(h*h));
+    double* tab = calloc(sizeof(double),taille);
     SDL_PixelFormat* format = surface->format;
 
     if(SDL_LockSurface(surface) != 0)
@@ -48,7 +50,7 @@ double* hough_function(SDL_Surface* surface, int* w, int* h)
 SDL_Renderer* create_the_beautiful_function(double* tab, int w, int h)
 {
     int max = 0;
-    for(int i = 0; i < (360 * ((w*w)+(h*h))),i++)
+    for(size_t i = 0; i < (size_t)(360 * ((w*w)+(h*h)));i++)
     {
         if (max < tab[i])
             max = tab[i];
@@ -72,7 +74,7 @@ SDL_Renderer* create_the_beautiful_function(double* tab, int w, int h)
     {
         for(int j = 0; j < h; j++)
         {
-            int color = (tab[i*j + j])/max;
+            int color = (tab[(size_t)i*j + j])/max;
             SDL_SetRenderDrawColor(renderer1,color,color,color,color);
             SDL_RenderDrawPoint(renderer1,i,j);
         }
@@ -81,7 +83,7 @@ SDL_Renderer* create_the_beautiful_function(double* tab, int w, int h)
     return renderer1;
 }
 
-void event_loop(SDL_Surface* surface,SDL_Renderer* renderer)
+void event_loop()
 {
     // Creates a variable to get the events.
     SDL_Event event;
@@ -129,17 +131,18 @@ int main(int argc, char** argv)
 
 
     //Call the hough function
-    double* tab = hough_function(s);
-    SDL_Renderer* renderer1 = create_the_beautiful_function(tab);
+    int w = 0;
+    int h = 0;
+    double* tab = hough_function(s,w,h);
+    SDL_Renderer* renderer1 = create_the_beautiful_function(tab,w,h);
     SDL_RenderPresent(renderer1);
-    event_loop(s,renderer1);
+    event_loop();
 
     // Destroys the objects.
     SDL_DestroyRenderer(renderer);
     SDL_DestroyTexture(t);
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer1);
-    SDL_DestroyWindow(window1);
     SDL_Quit();
 
 

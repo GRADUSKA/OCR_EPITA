@@ -1,37 +1,5 @@
 #include "use.h"
 
-
-void draw(SDL_Renderer* renderer)
-{
-    SDL_RenderPresent(renderer);
-}
-
-
-void event_loop(SDL_Renderer* renderer )
-{
-    SDL_Event event;
-
-    while (1)
-    {
-        SDL_WaitEvent(&event);
-        switch (event.type)
-        {
-            case SDL_QUIT:
-                return;
-
-            case SDL_WINDOWEVENT:
-                if(event.window.event == SDL_WINDOWEVENT_RESIZED)
-                    draw(renderer);
-                break;
-
-        }
-    }
-}
-
-
-
-
-
 int main(int argc, char **argv)
 {
     if(argc != 3)
@@ -79,18 +47,46 @@ int main(int argc, char **argv)
     SDL_RenderClear(renderer);
 
     double angle = 0;
-    for(size_t i = 0; argv[2][i] != 0; i++)
+    size_t i = 0;
+    int is_neg = 0;
+    if(argv[2][0] != '-' && (argv[2][0] < '0' || argv[2][0] > '9'))
+        errx(EXIT_FAILURE, "Put an valid angle ");
+
+    if(argv[2][0] == '-')
+    {
+        is_neg = 1;
+        i++;
+    }
+
+    for(; argv[2][i] != 0; i++)
     {
         if ('0' <= argv[2][i] && argv[2][i] <= '9')
             angle = angle *10 + (argv[2][i] - '0');
     }
 
+    if(is_neg)
+    {
+        angle = (360 - angle);
+        while(angle < 0)
+        {
+            angle +=360;
+        }
+    }
+    else
+    {
+        while(angle > 360)
+        {
+            angle -= 360;
+        }
+    }
+
     const double a = angle;
 
     SDL_RenderCopyEx(renderer, texTarget, NULL, NULL, a, NULL, SDL_FLIP_NONE);
- 
+
+    SDL_RenderPresent(renderer);
+    SDL_Delay(20000);
     SaveScreenshot(renderer);
-    event_loop(renderer);
 
 
     SDL_DestroyTexture(texTarget);

@@ -186,7 +186,7 @@ int main(int argc, char** argv)
     {
         sizes[0] = (size_t) 2;
         sizes[1] = (size_t) 2;
-        sizes[2] = (size_t) 2;
+        sizes[2] = (size_t) 1;
     }
     else if (argv[1][0] == 'd')
     {
@@ -262,20 +262,20 @@ int main(int argc, char** argv)
         input_list[2] = input_3;
         input_list[3] = input_4;
         init_xor(input_list);
-        double output_1[] = {1, 0};
-        double output_2[] = {0, 1};
-        double output_3[] = {0, 1};
-        double output_4[] = {1, 0};
-        double **expected_outputs = malloc((sizeof(double) * 2) * 4);
+        double output_1[] = {0};
+        double output_2[] = {1};
+        double output_3[] = {1};
+        double output_4[] = {0};
+        double **expected_outputs = malloc(sizeof(double) * 4);
         expected_outputs[0] = output_1;
         expected_outputs[1] = output_2;
         expected_outputs[2] = output_3;
         expected_outputs[3] = output_4;
 
-        for(size_t i = 0; i < 4; i++)
+        for(size_t i = 0; i < 100000000; i++)
         {
             printf("------------------------------------------------\n");
-            learn(input_list, layer_list, 0.004, expected_outputs, W, 4);
+            learn(input_list, layer_list, 0.04, expected_outputs, W, 4);
             printf("\n");
         }
 

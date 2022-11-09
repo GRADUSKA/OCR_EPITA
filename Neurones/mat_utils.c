@@ -11,9 +11,9 @@ typedef struct{
     double mat[];
 } matrix;
 
-double mat_get(matrix *mat, size_t i, size_t j)
+double mat_get(matrix *w, size_t i, size_t j)
 {
-    return mat->mat[i * mat->width + j];
+    return w->mat[i * w->width + j];
 }
 
 void mat_set(matrix *mat, size_t i, size_t j, double value)

@@ -1,1 +1,2 @@
-Comment ca fonctionne
+This is the S3 group project of EPITA that take an image of a sudoku
+and return the grid solved.

@@ -27,7 +27,9 @@ int main(int argc, char **argv)
     //Put your own bmp image here
     SDL_Surface *bmpSurf = load_image(argv[1]);
     SDL_Texture *bmpTex = SDL_CreateTextureFromSurface(renderer, bmpSurf);
-    SDL_SetWindowSize(win, bmpSurf -> w, bmpSurf -> h);
+    int w=bmpSurf->w,h=bmpSurf->h;
+
+    SDL_SetWindowSize(win, w, h);
     SDL_FreeSurface(bmpSurf);
 
     //Make a target texture to render too
@@ -83,10 +85,9 @@ int main(int argc, char **argv)
     const double a = angle;
 
     SDL_RenderCopyEx(renderer, texTarget, NULL, NULL, a, NULL, SDL_FLIP_NONE);
-
+    SaveScreenshot(renderer, w, h);
     SDL_RenderPresent(renderer);
     SDL_Delay(20000);
-    SaveScreenshot(renderer);
 
 
     SDL_DestroyTexture(texTarget);

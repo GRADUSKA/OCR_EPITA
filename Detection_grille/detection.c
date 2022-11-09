@@ -54,7 +54,7 @@ SDL_Renderer* create_the_beautiful_function(double* tab, int* w_1, int* h_1)
     int max = 0;
     int w = *w_1;
     int h = *h_1;
-    for(size_t i = 0; i < (size_t)(360 * ((w*w)+(h*h)));i++)
+    for(size_t i = 0; i < (size_t)(360 * sqrt((w*w)+(h*h)));i++)
     {
         if (max < tab[i])
             max = tab[i];
@@ -135,10 +135,10 @@ int main(int argc, char** argv)
 
 
     //Call the hough function
-    int* w = 0;
-    int* h = 0;
-    double* tab = hough_function(s,w,h);
-    SDL_Renderer* renderer1 = create_the_beautiful_function(tab,w,h);
+    int w = 0;
+    int h = 0;
+    double* tab = hough_function(s,&w,&h);
+    SDL_Renderer* renderer1 = create_the_beautiful_function(tab,&w,&h);
     event_loop();
 
     // Destroys the objects.

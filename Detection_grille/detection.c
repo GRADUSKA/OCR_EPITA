@@ -10,10 +10,10 @@ void foreach_pixels(Uint32 pixel_color, SDL_PixelFormat* format,
     SDL_GetRGB(pixel_color, format, &r, &g, &b);
     if (r != 0 && b != 0 && g != 0)
     {
-        for(float t = 0; t < M_PI; t++)
+        for(float t = 0; t < 360; t++)
         {
             SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-            int r = x * cos(t) + y * sin(t);
+            int r = x * cos((t* M_PI)/180) + y * sin((t* M_PI)/180);
             SDL_RenderDrawPoint(renderer,r,t);
         }
     }
@@ -84,7 +84,6 @@ int main(int argc, char** argv)
 
     if (window == NULL)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
-
     // Creates a renderer
     SDL_Renderer* renderer =
         SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
@@ -97,7 +96,6 @@ int main(int argc, char** argv)
             SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
     if (window1 == NULL)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
-
     // Creates a renderer.
     SDL_Renderer* renderer1 = SDL_CreateRenderer(window1, -1, SDL_RENDERER_ACCELERATED);
     if (renderer1 == NULL)

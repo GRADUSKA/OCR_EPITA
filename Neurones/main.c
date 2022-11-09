@@ -3,6 +3,7 @@
 #include <string.h>
 #include <err.h>
 #include <math.h>
+#include <time.h>
 #include "neuron_utils.h"
 #include "mat_utils.h"
 
@@ -38,7 +39,7 @@ void read_neuron(FILE *file, layers **layer_list, matrix **W)
     {
         j = 0;
 
-        while(c != '\0' && c != '\n' && j < W[num]->width * W[num]->length)    
+        while(c != '\0' && c != '\n' && j < W[num]->width * W[num]->length)
         {
             div = 1;
             while(c != ' ' && c != '\n' && c != '\0')
@@ -71,9 +72,9 @@ void read_neuron(FILE *file, layers **layer_list, matrix **W)
     size_t num = 1;
     for(; c != '\0' && num < 4; num++)
     {
-        j = 0; 
+        j = 0;
 
-        while(c != '\0' && c != '\n' && j < layer_list[num]->neuron_size)    
+        while(c != '\0' && c != '\n' && j < layer_list[num]->neuron_size)
         {
             div = 1;
             while(c != ' ' && c != '\n' && c != '\0')
@@ -125,7 +126,7 @@ void write_neuron(FILE *file, layers **layer_list, matrix **W)
                     j++;
                 }
             }
-            
+
             fputc(' ', p);
         }
         fputc('\n', p);
@@ -177,6 +178,8 @@ int main(int argc, char** argv)
     }
     else
         exit_help();
+
+    srand(time(NULL));
 
     layers **layer_list = malloc(sizeof(layers) * 4);
     init_layers(layer_list, sizes);
@@ -252,7 +255,7 @@ int main(int argc, char** argv)
         expected_outputs[3] = output_4;
 
         for(size_t i = 0; i < 500; i++)
-            learn(input_list, layer_list, 0.1, expected_outputs, W, 4);
+            learn(input_list, layer_list, 0.01, expected_outputs, W, 4);
 
         neuron_file = fopen(argv[2], "w");
         write_neuron(neuron_file, layer_list, W);

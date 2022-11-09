@@ -220,7 +220,7 @@ void calculate_hidden_values(double *neuron_values, matrix **W,
 /* a revoir */
 
 void update_gradient(matrix **W, double **biases, layers *in_layer,
-        double *neuron_values)
+        layers *output_layer, double *neuron_values)
 {
     for(size_t out = 0; out < W[in_layer->depth]->length; out++)
     {
@@ -229,7 +229,7 @@ void update_gradient(matrix **W, double **biases, layers *in_layer,
             W[in_layer->depth]->mat[out * W[in_layer->depth]->width + in] +=
                 in_layer->neurons[in] * neuron_values[out];
         }
-        biases[in_layer->depth][out] += neuron_values[out];
+        biases[in_layer->depth][out] += neuron_values[out] * output_layer->neurons[out];
     }
 }
 
@@ -249,15 +249,15 @@ void update_all_gradients(layers **input, matrix **W,
     calculate_values(input[3], expected_output,
             weighted_outputs, neuron_values);
     update_gradient(grad_w, grad_bias,
-            input[2], neuron_values);
+            input[2], input[3], neuron_values);
     for(size_t i = 2; i > 0; i--)
     {
-        double *hidden_neuron_values = 
+        double *hidden_neuron_values =
             calloc(sizeof(double), input[i]->neuron_size);
         calculate_hidden_values(neuron_values, W, input[i],
                 weighted_neurons[i-1], hidden_neuron_values);
         update_gradient(grad_w, grad_bias,
-                input[i-1], hidden_neuron_values);
+                input[i-1], input[i], hidden_neuron_values);
         neuron_values = malloc(sizeof(double) * input[i]->neuron_size);
         neuron_values = hidden_neuron_values;
     }

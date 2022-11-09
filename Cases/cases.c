@@ -4,16 +4,16 @@
 
 
 void to_case(SDL_Surface* surface, int list_coor[])
-{
+{   int w = surface->w;
+    int h = surface->h;
+
     SDL_LockSurface(surface);
 
     int l = list_coor[2] - list_coor[0];
     int v = list_coor[3] - list_coor[1];
-    int w = surface->w;
-    int h = surface->h;
     SDL_Surface* new_surface = SDL_CreateRGBSurface(0, l, v, 32, 0, 0, 0, 0);
     SDL_LockSurface(new_surface);
- 
+
 
     Uint32* pixels = surface->pixels;
     if (pixels == NULL)

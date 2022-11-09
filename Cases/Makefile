@@ -19,5 +19,6 @@ clean:
 	${RM} ${OBJ}
 	${RM} ${EXE}
 	${RM} *.txt
+	${RM} *.bmp
 
 # END

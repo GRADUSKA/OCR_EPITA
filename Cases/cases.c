@@ -3,34 +3,35 @@
 #include <SDL2/SDL_image.h>
 
 
-void to_case(SDL_Surface* surface, int list_coor[],  SDL_Renderer* renderer)
+void to_case(SDL_Surface* surface, int list_coor[])
 {
     SDL_LockSurface(surface);
 
-    int x = list_coor[2] - list_coor[0];
-    int y = list_coor[5] - list_coor[1];
-
-    SDL_Surface* new_surface = SDL_CreateRGBSurface(0, x, y, 32, 0, 0, 0, 0);
+    int l = list_coor[2] - list_coor[0];
+    int v = list_coor[3] - list_coor[1];
+    int w = surface->w;
+    int h = surface->h;
+    SDL_Surface* new_surface = SDL_CreateRGBSurface(0, l, v, 32, 0, 0, 0, 0);
     SDL_LockSurface(new_surface);
-
+ 
 
     Uint32* pixels = surface->pixels;
     if (pixels == NULL)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
 
     Uint32* new_pixels = new_surface->pixels;
-    if (pixels == NULL)
+    if (new_pixels == NULL)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
 
 
     int k = 0;
-    for(int i = list_coor[1]; i < list_coor[5]; i++)
+    for(int i = list_coor[1]; i <= list_coor[3] && i < h; i++)
     {
-        int l = 0;
-        for(int j = list_coor[0]; j < list_coor[2]; j++)
+        int p = 0;
+        for(int j = list_coor[0]; j <= list_coor[2] && j < w; j++)
         {
-            new_pixels[k*x+l] = pixels[i*x+j];
-            l++;
+            new_pixels[k*l + p] = pixels[i*l+j];
+            p++;
         }
         k++;
     }
@@ -73,7 +74,7 @@ int main(int argc, char** argv)
         errx(EXIT_FAILURE, "Usage: image-file");
     }
 
-    int list_coor[] = {0,0,500,0,0,500}; //TODOOOOO
+    int list_coor[] = {0,0,200,200}; //TODOOOOO
 
 
 
@@ -100,7 +101,7 @@ int main(int argc, char** argv)
     if (texture == NULL)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
 
-    to_case(surface, list_coor, renderer);
+    to_case(surface, list_coor);
 
     // - Free the surface.
     SDL_FreeSurface(surface);

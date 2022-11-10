@@ -29,7 +29,7 @@ int main(int argc, char **argv)
     SDL_Texture *bmpTex = SDL_CreateTextureFromSurface(renderer, bmpSurf);
     int w=bmpSurf->w,h=bmpSurf->h;
 
-    SDL_SetWindowSize(win, w, h);
+    SDL_SetWindowSize(win, w + 1/w, h + 1/h);
     SDL_FreeSurface(bmpSurf);
 
     //Make a target texture to render too

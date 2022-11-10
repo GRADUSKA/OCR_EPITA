@@ -4,22 +4,24 @@
 
 
 void foreach_pixels(Uint32 pixel_color, SDL_PixelFormat* format,
-        double* tab, int x, int y)
+        int* tab, int x, int y,int taille)
 {
     Uint8 r, g, b;
     SDL_GetRGB(pixel_color, format, &r, &g, &b);
     if (r != 0 && b != 0 && g != 0)
     {
-        for(float t = 0; t < 180; t++)
+        for(int t = 0; t < 360; t++)
         {
-            int r = x * cos((t* M_PI)/180) + y * sin((t* M_PI)/180);
-            size_t c = (size_t)r*360+t;
-            tab[c] = tab[c] + 1;
+            int r = x * cos((t * M_PI)/180) + y * sin((t* M_PI)/180);
+            if(r >= 0 && r < taille)
+            {
+                tab[r * 360 + t]+=1;
+            }
         }
     }
 }
 
-double* hough_function(SDL_Surface* surface, int* w_1, int* h_1)
+int* hough_function(SDL_Surface* surface, int* w_1, int* h_1)
 {
     // Take the weight and height of my pixels
     Uint32* pixels = surface->pixels;
@@ -27,7 +29,7 @@ double* hough_function(SDL_Surface* surface, int* w_1, int* h_1)
     int h = surface->h;
 
     int taille = 360*sqrt((w*w)+(h*h));
-    double* tab = calloc(sizeof(double),taille);
+    int* tab = calloc(taille,sizeof(int));
     SDL_PixelFormat* format = surface->format;
 
     if(SDL_LockSurface(surface) != 0)
@@ -39,7 +41,7 @@ double* hough_function(SDL_Surface* surface, int* w_1, int* h_1)
     {
         for(int j = 0; j < w; j++)
         {
-            foreach_pixels(pixels[w*i + j],format,tab,j,i);
+            foreach_pixels(pixels[w*i + j],format,tab,i,j, taille/360);
         }
     }
 
@@ -49,12 +51,12 @@ double* hough_function(SDL_Surface* surface, int* w_1, int* h_1)
     return tab;
 }
 
-SDL_Renderer* create_the_beautiful_function(double* tab, int* w_1, int* h_1)
+SDL_Renderer* create_the_beautiful_function(int* tab, int* w_1, int* h_1)
 {
     int max = 0;
     int w = *w_1;
     int h = *h_1;
-    for(size_t i = 0; i < (size_t)(360 * sqrt((w*w)+(h*h)));i++)
+    for(int i = 0; i < (360 * sqrt((w*w)+(h*h)));i++)
     {
         if (max < tab[i])
             max = tab[i];
@@ -72,13 +74,28 @@ SDL_Renderer* create_the_beautiful_function(double* tab, int* w_1, int* h_1)
     SDL_SetRenderDrawColor(renderer1, 0, 0, 0, 255);
     SDL_RenderClear(renderer1);
 
+/*    SDL_Surface* new_surface = SDL_CreateRGBSurface(0,w,h,32,0,0,0,0);
+    Uint32* pixels = new_surface->pixels;
+    for (int y = 0; y < h; ++y)
+    {
+        for(int x = 0; x < w; ++x)
+        {
+            if (tab[y*w+x] > 0)
+            {
+                int r = pixels[y*w+x] * 255 / max;
+                pixels[y*w+x] = SDL_MapRGB(new_surface->format,r,r,r);
+            }
+        }
+    }
+    return new_surface;
+*/
     //Do the lines
     SDL_SetRenderDrawColor(renderer1,255,255,255,255);
     for(int i = 0; i < h; i++)
     {
         for(int j = 0; j < w; j++)
         {
-            int color = (tab[(size_t)i*w + j])/max;
+            int color = (tab[i*w + j]*255)/max;
             SDL_SetRenderDrawColor(renderer1,color,color,color,color);
             SDL_RenderDrawPoint(renderer1,i,j);
         }
@@ -137,15 +154,15 @@ int main(int argc, char** argv)
     //Call the hough function
     int w = 0;
     int h = 0;
-    double* tab = hough_function(s,&w,&h);
-    SDL_Renderer* renderer1 = create_the_beautiful_function(tab,&w,&h);
+    int* tab = hough_function(s,&w,&h);
+    SDL_Renderer* r = create_the_beautiful_function(tab,&w,&h);
     event_loop();
-
     // Destroys the objects.
     SDL_DestroyRenderer(renderer);
+    SDL_DestroyRenderer(r);
+    SDL_FreeSurface(s);
     SDL_DestroyTexture(t);
     SDL_DestroyWindow(window);
-    SDL_DestroyRenderer(renderer1);
     SDL_Quit();
 
 

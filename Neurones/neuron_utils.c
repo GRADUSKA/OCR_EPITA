@@ -128,7 +128,7 @@ void weight_inputs(matrix *W, layers *in_layer, layers *out_layer)
     for(size_t out = 0; out < W->length; out++){
         for(size_t in = 0; in < W->width; in++)
         {
-            out_layer->neurons[out] 
+            out_layer->neurons[out]
                 += get_neuron(in_layer, in) * W->mat[out * W->width + in];
         }
     }
@@ -305,6 +305,12 @@ void learn(layers **input_list, layers **layer_list, double learn_rate,
     }
     while(input < input_number)
     {
+        for(size_t i = 1; i < 4; i++)
+        {
+            for(size_t neuron = 0; neuron < layer_list[i]->neuron_size; neuron++)
+                layer_list[i]->neurons[neuron] = 0;
+        }
+
         printf("\n");
         layer_list[0]->neurons = input_list[input]->neurons;
         printf("input = %i %i\n",
@@ -317,11 +323,23 @@ void learn(layers **input_list, layers **layer_list, double learn_rate,
         printf("result = %lu\npercentage = %f\n",
                 max, layer_list[3]->neurons[0]);
         input += 1;
-        for(size_t i = 1; i < 4; i++)
-        {
-            for(size_t neuron = 0; neuron < layer_list[i]->neuron_size; neuron++)
-                layer_list[i]->neurons[neuron] = 0;
-        }
     }
+    double costs = 0;
+    for(size_t i = 0; i < layer_list[3]->neuron_size; i++)
+    {
+        costs += cost(layer_list[3], expected_outputs[3], i);
+    }
+    if(costs > 0.5 && grad_changes(grad_w, grad_bias)
+            shuffle(grad_w, grad_bias, costs);
     apply_gradients(learn_rate/input_number, layer_list, W, grad_w, grad_bias);
+}
+
+int grad_changes(matrix **grad_w, double **grad_bias)
+{
+
+}
+
+void shuffle(matrix **grad_w, double **grad_bias, double costs)
+{
+
 }

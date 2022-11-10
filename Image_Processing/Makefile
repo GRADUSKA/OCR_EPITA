@@ -2,8 +2,8 @@
 
 CC = gcc
 CPPFLAGS =
-CFLAGS = -g -Wall -Wextra -O3 `pkg-config --cflags sdl2 SDL2_image` -lm
-LDFLAGS =
+CFLAGS = -g -Wall -Wextra -O3  `pkg-config --cflags sdl2 SDL2_image` -lm
+LDFLAGS = -g 
 LDLIBS = `pkg-config --libs sdl2 SDL2_image` -lm
 
 all: grayscale rotation Gaussian_blur canny
@@ -22,5 +22,5 @@ clean:
 	${RM} ${OBJ}
 	${RM} ${EXE}
 	${RM} *.bmp
-
+	${RM} *.jpg
 # END

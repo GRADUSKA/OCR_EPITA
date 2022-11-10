@@ -172,10 +172,11 @@ int main(int argc, char** argv)
         errx(EXIT_FAILURE, "Usage: image-file");
 
     SDL_Surface* s = load_image(argv[1]);
-
-    double* theta = direction_grad(Convolution(s,Kx), Convolution(s,Ky),
-            s->w*s->h);
-
+    int* Gx = Convolution(s,Kx);
+    int* Gy = Convolution(s,Ky);
+    double* theta = direction_grad(Gx, Gy,s->w*s->h);
+    free(Gx);
+    free(Gy);
     ApplySobel(s);
     double* nms = non_max_suppr(s,theta);
     Uint32* pixels = s->pixels;
@@ -186,7 +187,8 @@ int main(int argc, char** argv)
     }
     SDL_UnlockSurface(s);
     SDL_SaveBMP(s, "test_canny.bmp");
-
+    free(nms);
+    free(theta);
     SDL_FreeSurface(s);
 
     // Destroys the objects.

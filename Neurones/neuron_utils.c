@@ -305,7 +305,7 @@ int grad_changes(matrix **grad_w, double **grad_bias, layers **layer_list)
     return 1;
 }
 
-void shuffle(matrix **grad_w, double **grad_bias, layers **layer_list, double costs)
+void shuffle(matrix **grad_w, double **grad_b, layers **layer_list, double costs)
 {
     for(size_t i = 0; i < 3; i++)
     {
@@ -313,9 +313,9 @@ void shuffle(matrix **grad_w, double **grad_bias, layers **layer_list, double co
         {
             for(size_t in = 0; in < layer_list[i]->neuron_size; in++)
             {
-                grad_w[i]->mat[out * layer_list[i]->neuron_size + in] += 9 * costs / RAND_MAX;
+                grad_w[i]->mat[out * layer_list[i]->neuron_size + in] *= costs * 10.;
             }
-            grad_bias[i][out] += 9 * costs / RAND_MAX;
+            grad_b[i][out] *= costs * 10.;
         }
     }
 }
@@ -331,6 +331,8 @@ void learn(layers **input_list, layers **layer_list, double learn_rate,
     {
         matrix *m = calloc(sizeof(matrix),1);
         m->mat = calloc(sizeof(double), (W[i]->width * W[i]->length));
+        for(size_t j = 0; j < W[i]->width * W[i]->length; j++)
+            m->mat[j] = (double)rand() / (double)RAND_MAX;
         grad_w[i] = m;
         double *b = calloc(sizeof(double), layer_list[1]->neuron_size);
         grad_bias[i] = b;
@@ -361,7 +363,7 @@ void learn(layers **input_list, layers **layer_list, double learn_rate,
     {
         costs += cost(layer_list[3], expected_outputs[3], i);
     }
-    if(costs > 0.8 && grad_changes(grad_w, grad_bias, layer_list))
+    if(costs > 0.4 && grad_changes(grad_w, grad_bias, layer_list))
             shuffle(grad_w, grad_bias, layer_list, costs);
     apply_gradients(learn_rate/input_number, layer_list, W, grad_w, grad_bias);
 }

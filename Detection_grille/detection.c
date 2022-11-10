@@ -12,10 +12,13 @@ void foreach_pixels(Uint32 pixel_color, SDL_PixelFormat* format,
     {
         for(int t = 0; t < 360; t++)
         {
-            int r = x * cos((t * M_PI)/180) + y * sin((t* M_PI)/180);
-            if(r >= 0 && r < taille)
+            double rho = (double)x * cos(((double)t * M_PI)/180.) +
+               (double) y * sin(((double)t* M_PI)/180.);
+
+            int _rho_ = rho + taille/2;
+            if(_rho_ >= 0 && _rho_ < taille)
             {
-                tab[r * 360 + t]+=1;
+                tab[_rho_ * 360 + t]+=1;
             }
         }
     }
@@ -25,10 +28,10 @@ int* hough_function(SDL_Surface* surface, int* w_1, int* h_1)
 {
     // Take the weight and height of my pixels
     Uint32* pixels = surface->pixels;
-    int w  = surface->w;
-    int h = surface->h;
+    *w_1 = surface->w;
+    *h_1 = surface->h;
 
-    int taille = 360*sqrt((w*w)+(h*h));
+    int taille = 360*sqrt(((*w_1)*(*w_1))+((*h_1)*(*h_1)));
     int* tab = calloc(taille,sizeof(int));
     SDL_PixelFormat* format = surface->format;
 
@@ -37,32 +40,29 @@ int* hough_function(SDL_Surface* surface, int* w_1, int* h_1)
     SDL_LockSurface(surface);
 
     // Try if a pixel is important or not and if it is, continue in another function
-    for(int i = 0; i < h; i++)
+    for(int i = 0; i < (*h_1); i++)
     {
-        for(int j = 0; j < w; j++)
+        for(int j = 0; j < (*w_1); j++)
         {
-            foreach_pixels(pixels[w*i + j],format,tab,i,j, taille/360);
+            foreach_pixels(pixels[(*w_1)*i + j],format,tab,j,i, taille/360);
         }
     }
 
     SDL_UnlockSurface(surface);
-    *w_1 = w;
-    *h_1 = h;
     return tab;
 }
 
 SDL_Renderer* create_the_beautiful_function(int* tab, int* w_1, int* h_1)
 {
     int max = 0;
-    int w = *w_1;
-    int h = *h_1;
-    for(int i = 0; i < (360 * sqrt((w*w)+(h*h)));i++)
+    for(int i = 0; i < (360 * sqrt((((*w_1)*(*w_1)))+((*h_1)*(*h_1))));i++)
     {
         if (max < tab[i])
             max = tab[i];
     }
     // Creates a window.
-    SDL_Window* window1 = SDL_CreateWindow("Plain Window", 0, 0,360, sqrt((w*w)+(h*h)),0);
+    SDL_Window* window1 = SDL_CreateWindow("Plain Window", 0, 0,360,
+        sqrt((((*w_1)*(*w_1)))+((*h_1)*(*h_1))),0);
     if (window1 == NULL)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
     // Creates a renderer.
@@ -74,29 +74,29 @@ SDL_Renderer* create_the_beautiful_function(int* tab, int* w_1, int* h_1)
     SDL_SetRenderDrawColor(renderer1, 0, 0, 0, 255);
     SDL_RenderClear(renderer1);
 
-/*    SDL_Surface* new_surface = SDL_CreateRGBSurface(0,w,h,32,0,0,0,0);
-    Uint32* pixels = new_surface->pixels;
-    for (int y = 0; y < h; ++y)
-    {
-        for(int x = 0; x < w; ++x)
-        {
-            if (tab[y*w+x] > 0)
-            {
-                int r = pixels[y*w+x] * 255 / max;
-                pixels[y*w+x] = SDL_MapRGB(new_surface->format,r,r,r);
-            }
-        }
-    }
-    return new_surface;
-*/
+    /*    SDL_Surface* new_surface = SDL_CreateRGBSurface(0,w,h,32,0,0,0,0);
+          Uint32* pixels = new_surface->pixels;
+          for (int y = 0; y < h; ++y)
+          {
+          for(int x = 0; x < w; ++x)
+          {
+          if (tab[y*w+x] > 0)
+          {
+          int r = pixels[y*w+x] * 255 / max;
+          pixels[y*w+x] = SDL_MapRGB(new_surface->format,r,r,r);
+          }
+          }
+          }
+          return new_surface;
+          */
     //Do the lines
     SDL_SetRenderDrawColor(renderer1,255,255,255,255);
-    for(int i = 0; i < h; i++)
+    for(int i = 0; i < (*h_1)*2; i++)
     {
-        for(int j = 0; j < w; j++)
+        for(int j = 0; j < (*w_1)*2; j++)
         {
-            int color = (tab[i*w + j]*255)/max;
-            SDL_SetRenderDrawColor(renderer1,color,color,color,color);
+            int color = (tab[i*(*w_1) + j]*255)/max;
+            SDL_SetRenderDrawColor(renderer1,color,color,color,255);
             SDL_RenderDrawPoint(renderer1,i,j);
         }
     }
@@ -119,7 +119,7 @@ void event_loop()
             // If the "quit" button is pushed, ends the event loop.
             case SDL_QUIT:
                 return;
-                
+
         }
     }
 }

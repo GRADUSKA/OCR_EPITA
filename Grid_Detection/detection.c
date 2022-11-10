@@ -16,7 +16,7 @@ void foreach_pixels(Uint32 pixel_color, SDL_PixelFormat* format,
                (double) y * sin(((double)t* M_PI)/180.);
 
             int _rho_ = rho + taille/2;
-            if(_rho_ >= 0 && _rho_ < taille)
+            if(_rho_ >= 0 && _rho_ <= taille)
             {
                 tab[_rho_ * 360 + t]+=1;
             }
@@ -91,13 +91,14 @@ SDL_Renderer* create_the_beautiful_function(int* tab, int* w_1, int* h_1)
           */
     //Do the lines
     SDL_SetRenderDrawColor(renderer1,255,255,255,255);
-    for(int i = 0; i < (*h_1)*2; i++)
+    for(int i = 0; i < (sqrt((((*w_1)*(*w_1)))+((*h_1)*(*h_1)))); i++)
     {
-        for(int j = 0; j < (*w_1)*2; j++)
+        for(int j = 0; j < 360; j++)
         {
-            int color = (tab[i*(*w_1) + j]*255)/max;
+            int indice = i*360 + j;
+            int color = (tab[indice]*255)/max;
             SDL_SetRenderDrawColor(renderer1,color,color,color,255);
-            SDL_RenderDrawPoint(renderer1,i,j);
+            SDL_RenderDrawPoint(renderer1,j,i);
         }
     }
     SDL_RenderPresent(renderer1);

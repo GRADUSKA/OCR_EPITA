@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 
+
 int is_possible(char sudoku[], int i, int j, char value)
 {
 
@@ -37,7 +38,9 @@ int is_possible(char sudoku[], int i, int j, char value)
     
 }
 
-int solver(char sudoku[])
+
+
+int solver(char sudoku[]) //the solver using backtracking
 {
     for(int i = 0; i < 9; i++)
     {
@@ -64,8 +67,6 @@ int solver(char sudoku[])
     return 1;
 }
 
-
-void print_solver(char sudoku[]);
 
 int main(int argc, char *argv[])
 {
@@ -147,18 +148,3 @@ int main(int argc, char *argv[])
 
 }
 
-/*
-
-void print_solver(char sudoku[])
-{
-    for(int i = 0; i < 9; i++)
-    {
-        for(int j = 0; j < 9; j++)
-        {
-            printf("%c ", sudoku[i*9+j]);
-        }
-        printf("\n");
-    }
-}
-
-*/

@@ -3,7 +3,7 @@
 #include <SDL2/SDL_image.h>
 
 
-void to_case(SDL_Surface* surface)
+void to_case(SDL_Surface* surface, char name[], char where[], int x, int y)
 {   
 
     SDL_Surface* new_surface = SDL_CreateRGBSurface(0, (surface->w)/9, (surface->h)/9, 32, 0, 0, 0, 0); 
@@ -21,12 +21,12 @@ void to_case(SDL_Surface* surface)
     SDL_LockSurface(surface);
     SDL_LockSurface(new_surface);
 
-    int k = (surface->w)/9; 
+    int k = x; 
     //position "x" of the first pixel of the case in the grid
     
     for(int i = 0; i < new_surface->h; i++)
     {
-        int l = 0; 
+        int l = y; 
         // position "y" of the first pixel of the case in the grid
         
         for(int j = 0; j < new_surface->w; j++)
@@ -37,7 +37,27 @@ void to_case(SDL_Surface* surface)
         k++;
     }
 
-    SDL_SaveBMP(new_surface, "boxe.bmp");
+    int z = 0;
+    char new[11];
+    while(name[z] != '\0')
+    {
+        new[z] = name[z];
+        z++;
+    }
+    new[z] = where[0];
+    z++;
+    new[z] = where[1];
+    z++;
+    new[z] = '.';
+    z++;
+    new[z] = 'b';
+    z++;
+    new[z] = 'm';
+    z++;
+    new[z] = 'p';
+
+
+    SDL_SaveBMP(new_surface, new);
 
     SDL_UnlockSurface(new_surface);
 
@@ -98,7 +118,9 @@ int main(int argc, char** argv)
     if (texture == NULL)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
 
-    to_case(surface);
+    to_case(surface, "boxe_", "01", 0, 0);
+    to_case(surface, "boxe_", "02", (surface->w)/9, 0);
+    to_case(surface, "boxe_", "03", 0, (surface->h)/9);
 
     // - Free the surface.
     SDL_FreeSurface(surface);

@@ -3,95 +3,46 @@
 #include <err.h>
 #include <SDL2/SDL.h>
 
-// Initial width and height of the window.
-const int INIT_WIDTH = 640;
-const int INIT_HEIGHT = 400;
-
-// Ratio used to reduce the length of a segment.
-const double RATIO = 0.7;
-
-// Maximum recursion level.
-const int TOP_LEVEL = 10;
-
-// Step angle to rotate a segment.
-const double STEP_ANGLE = M_PI / 6;
-
-
-// Initializes the renderer, draws the fractal canopy and updates the display.
-//
-// renderer: Renderer to draw on.
-// w: Current width of the window.
-// h: Current height of the window.
-void draw(SDL_Renderer* renderer, int w, int h)
+void draw_digits(SDL_Surface surface, char* sudoku_file, char* result_file)
 {
-
-    // If the width or the height is too small, we do not draw anything.
-    if (w < 20 || h < 20)
-        return;
-
-    // Clears the renderer (sets the background to white).
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    SDL_RenderClear(renderer);
-
-    // Sets the color for drawing operations to black.
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-
-    // Draws the fractal canopy.
-    v(renderer, w / 2, h, h / 4, 0, 0);
-
-    // Updates the display.
-    SDL_RenderPresent(renderer);
-}
-
-
-// Event loop that calls the relevant event handler.
-//
-// renderer: Renderer to draw on.
-void event_loop(SDL_Renderer* renderer)
-{
-    // Width and height of the window.
-    int w = INIT_WIDTH;
-    int h = INIT_HEIGHT;
-
-    // Draws the fractal canopy (first draw).
-    draw(renderer, w, h);
-
-    // Creates a variable to get the events.
-    SDL_Event event;
-
-    while (1)
+    FILE *sudoku = fopen(sudoku_file, "r");
+    if(sudoku == NULL)
     {
-        // Waits for an event.
-        SDL_WaitEvent(&event);
-
-        switch (event.type)
-        {
-            // If the "quit" button is pushed, ends the event loop.
-            case SDL_QUIT:
-                return;
-
-            // If the window is resized, updates and redraws the diagonals.
-            case SDL_WINDOWEVENT:
-                if (event.window.event == SDL_WINDOWEVENT_RESIZED)
-                {
-                    w = event.window.data1;
-                    h = event.window.data2;
-                    draw(renderer, w, h);
-                }
-                break;
-        }
+        printf("Erreur fopen\n");
+        return 1;
     }
+
+    FILE *result = fopen(result_file, "r");
+    if(result  == NULL)
+    {
+        printf("Erreur fopen\n");
+        return 1;
+    }
+    SDL_LockSurface(surface);
+
+
+
+
+
+    SDL_UnlockSurface(surface);
+    fclose(sudoku);
+    fclose(result);
 }
 
 
-int main()
+
+int main(int argc, char** argv)
 {
+    // Checks the number of arguments.
+    if (argc != 4)
+        errx(EXIT_FAILURE, "Usage: image-file");
+
     // Initializes the SDL.
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
 
     // Creates a window.
-    SDL_Window* window = SDL_CreateWindow("Static Fractal Canopy", 0, 0, INIT_WIDTH, INIT_HEIGHT,
+    SDL_Window* window = SDL_CreateWindow("Plain Window", 0, 0, 0, 0,
             SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
     if (window == NULL)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
@@ -101,8 +52,10 @@ int main()
     if (renderer == NULL)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
 
-    // Dispatches the events.
-    event_loop(renderer);
+    // - Create a surface.
+    SDL_Surface* surface = load_image(argv[1]);
+
+    draw_digits(surface, argv[2], argv[3]);
 
     // Destroys the objects.
     SDL_DestroyRenderer(renderer);

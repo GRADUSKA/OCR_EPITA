@@ -15,5 +15,6 @@ clean:
 	${RM} ${OBJ} 
 	${RM} ${DEP}
 	${RM} solver
+	${RM} grids/*.result
 
 -include ${DEP}

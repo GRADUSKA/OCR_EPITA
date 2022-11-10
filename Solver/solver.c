@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 
-
+//check if it's possible to place the value
 int is_possible(char sudoku[], int i, int j, char value)
 {
 
@@ -39,8 +39,8 @@ int is_possible(char sudoku[], int i, int j, char value)
 }
 
 
-
-int solver(char sudoku[]) //the solver using backtracking
+//the solver using backtracking
+int solver(char sudoku[])
 {
     for(int i = 0; i < 9; i++)
     {
@@ -68,18 +68,12 @@ int solver(char sudoku[]) //the solver using backtracking
 }
 
 
-int main(int argc, char *argv[])
+//fill the sudoku with the sudoku in the file
+int fill_sudoku(char* name, char sudoku[])
 {
-    if(argc != 2)
-    {
-        printf("probleme argc\n");
-        return 1;
-    }
-
     FILE *fp;
-    char sudoku[81];
 
-    fp = fopen(argv[1], "r");
+    fp = fopen(name, "r");
     if(fp == NULL)
     {
         printf("Erreur fopen\n");
@@ -98,13 +92,13 @@ int main(int argc, char *argv[])
     }
 
     fclose(fp);
+    return 0;
+}
 
-    solver(sudoku);
 
-
-
-    char *name = argv[1];
-    
+//write the sudoku result in a file .result
+void file_result(char *name, char sudoku[])
+{
     char result[] = ".result";
 
     int z = 0;
@@ -143,6 +137,23 @@ int main(int argc, char *argv[])
         }
     }
 
+}
+
+
+int main(int argc, char *argv[])
+{
+    if(argc != 2)
+    {
+        printf("probleme argc\n");
+        return 1;
+    }
+
+    char *name = argv[1];
+    char sudoku[81];
+
+    fill_sudoku(name, sudoku);
+    solver(sudoku);
+    file_result(name, sudoku);
 
     return 0;
 

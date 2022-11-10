@@ -35,12 +35,12 @@ void init_layers(layers **layer_list, size_t *sizes)
     double *b3 = malloc(sizes[2] * sizeof(double));
 
     for(size_t out = 0; out < sizes[1]; out++){
-        b1[out] = 2. * ((double)rand() + (double)rand()) / ((double)RAND_MAX);
-        b2[out] = 2. * ((double)rand() + (double)rand()) / ((double)RAND_MAX);
+        b1[out] = ((double)rand() + (double)rand()) / ((double)RAND_MAX);
+        b2[out] = ((double)rand() + (double)rand()) / ((double)RAND_MAX);
     }
 
     for(size_t out = 0; out < sizes[2]; out++){
-        b3[out] = 2. * ((double)rand() + (double)rand()) / ((double)RAND_MAX);
+        b3[out] = ((double)rand() + (double)rand()) / ((double)RAND_MAX);
     }
 
     input_layer->depth = 0;
@@ -79,7 +79,7 @@ void init_weight(double *w, size_t *sizes, size_t i)
         for(size_t width = 0; width < *(sizes + i / 2); width++)
         {
             w[length * (*(sizes + i / 2)) + width] =
-                2. * ((double)rand() + (double)rand()) / ((double)RAND_MAX);
+                ((double)rand() + (double)rand()) / ((double)RAND_MAX);
         }
     }
 }
@@ -287,6 +287,38 @@ void apply_gradients(double learn_rate, layers **layer, matrix **W,
     }
 }
 
+int grad_changes(matrix **grad_w, double **grad_bias, layers **layer_list)
+{
+    for(size_t i = 0; i < 3; i++)
+    {
+        for(size_t out = 0; out < layer_list[i+1]->neuron_size; out++)
+        {
+            for(size_t in = 0; in < layer_list[i]->neuron_size; in++)
+            {
+                if(grad_w[i]->mat[out * layer_list[i]->neuron_size + in] > 0.01)
+                    return 0;
+            }
+            if(grad_bias[i][out] > 0.01)
+               return 0;
+        }
+    }
+    return 1;
+}
+
+void shuffle(matrix **grad_w, double **grad_bias, layers **layer_list, double costs)
+{
+    for(size_t i = 0; i < 3; i++)
+    {
+        for(size_t out = 0; out < layer_list[i+1]->neuron_size; out++)
+        {
+            for(size_t in = 0; in < layer_list[i]->neuron_size; in++)
+            {
+                grad_w[i]->mat[out * layer_list[i]->neuron_size + in] += 9 * costs / RAND_MAX;
+            }
+            grad_bias[i][out] += 9 * costs / RAND_MAX;
+        }
+    }
+}
 
 void learn(layers **input_list, layers **layer_list, double learn_rate,
         double **expected_outputs, matrix **W, size_t input_number)
@@ -329,17 +361,7 @@ void learn(layers **input_list, layers **layer_list, double learn_rate,
     {
         costs += cost(layer_list[3], expected_outputs[3], i);
     }
-    if(costs > 0.5 && grad_changes(grad_w, grad_bias)
-            shuffle(grad_w, grad_bias, costs);
+    if(costs > 0.8 && grad_changes(grad_w, grad_bias, layer_list))
+            shuffle(grad_w, grad_bias, layer_list, costs);
     apply_gradients(learn_rate/input_number, layer_list, W, grad_w, grad_bias);
-}
-
-int grad_changes(matrix **grad_w, double **grad_bias)
-{
-
-}
-
-void shuffle(matrix **grad_w, double **grad_bias, double costs)
-{
-
 }

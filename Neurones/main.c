@@ -272,10 +272,16 @@ int main(int argc, char** argv)
         expected_outputs[2] = output_3;
         expected_outputs[3] = output_4;
 
-        for(size_t i = 0; i < 100000000; i++)
+        for(size_t i = 0; i < 1000000000; i++)
         {
             printf("------------------------------------------------\n");
             learn(input_list, layer_list, 0.15, expected_outputs, W, 4);
+            printf("\n");
+        }
+        for(size_t i = 0; i < 3; i++)
+        {
+            for(size_t j = 0; j < W[i]->length * W[i]->width; j++)
+                printf("%f ", W[i]->mat[j]);
             printf("\n");
         }
 

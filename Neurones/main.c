@@ -177,6 +177,8 @@ void write_neuron(FILE *file, layers **layer_list, matrix **W)
 
 int main(int argc, char** argv)
 {
+    srand(time(NULL));
+
     if(argc != 4 && argc != 5)
         exit_help();
 
@@ -196,8 +198,6 @@ int main(int argc, char** argv)
     }
     else
         exit_help();
-
-    srand(time(NULL));
 
     layers **layer_list = malloc(sizeof(layers) * 4);
     init_layers(layer_list, sizes);
@@ -272,13 +272,13 @@ int main(int argc, char** argv)
         expected_outputs[2] = output_3;
         expected_outputs[3] = output_4;
 
-        for(size_t i = 0; i < 1000000000; i++)
+        for(size_t i = 0; i < 10000000000; i++)
         {
             printf("------------------------------------------------\n");
-            learn(input_list, layer_list, 0.15, expected_outputs, W, 4);
+            learn(input_list, layer_list, 0.01, expected_outputs, W, 4);
             printf("\n");
         }
-        for(size_t i = 0; i < 3; i++)
+        for(size_t i = 0; i < 4; i++)
         {
             for(size_t j = 0; j < W[i]->length * W[i]->width; j++)
                 printf("%f ", W[i]->mat[j]);

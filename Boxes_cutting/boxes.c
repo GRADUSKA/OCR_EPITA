@@ -3,11 +3,10 @@
 #include <SDL2/SDL_image.h>
 
 
-void to_case(SDL_Surface* surface, char name[], char where[], int x, int y)
+void to_case(SDL_Surface* surface, char name[], char where[], int x, int y, int w, int h)
 {   
-
-    SDL_Surface* new_surface = SDL_CreateRGBSurface(0, (surface->w)/9, (surface->h)/9, 32, 0, 0, 0, 0); 
     // to change : the width and the heigh by the real 
+    SDL_Surface* new_surface = SDL_CreateRGBSurface(0, w, h, 32, 0, 0, 0, 0); 
 
     Uint32* pixels = surface->pixels;
     if (pixels == NULL)
@@ -21,13 +20,13 @@ void to_case(SDL_Surface* surface, char name[], char where[], int x, int y)
     SDL_LockSurface(surface);
     SDL_LockSurface(new_surface);
 
-    int k = x; 
     //position "x" of the first pixel of the case in the grid
-    
+    int k = x; 
+        
     for(int i = 0; i < new_surface->h; i++)
     {
-        int l = y; 
         // position "y" of the first pixel of the case in the grid
+        int l = y;
         
         for(int j = 0; j < new_surface->w; j++)
         {
@@ -118,9 +117,12 @@ int main(int argc, char** argv)
     if (texture == NULL)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
 
-    to_case(surface, "boxe_", "01", 0, 0);
-    to_case(surface, "boxe_", "02", (surface->w)/9, 0);
-    to_case(surface, "boxe_", "03", 0, (surface->h)/9);
+    int w = (surface->w)/9;
+    int h = (surface->h)/9;
+
+    to_case(surface, "boxe_", "01", 0, 0, w, h);
+    to_case(surface, "boxe_", "02", (surface->w)/9, 0, w, h);
+    to_case(surface, "boxe_", "03", 0, (surface->h)/9, w, h);
 
     // - Free the surface.
     SDL_FreeSurface(surface);

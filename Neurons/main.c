@@ -187,7 +187,7 @@ int main(int argc, char** argv)
     if(argv[1][0] == 'x')
     {
         sizes[0] = (size_t) 2;
-        sizes[1] = (size_t) 2;
+        sizes[1] = (size_t) 4;
         sizes[2] = (size_t) 1;
     }
     else if (argv[1][0] == 'd')
@@ -199,9 +199,9 @@ int main(int argc, char** argv)
     else
         exit_help();
 
-    layers **layer_list = malloc(sizeof(layers) * 4);
+    layers **layer_list = malloc(sizeof(layers*) * 4);
     init_layers(layer_list, sizes);
-    matrix **W = malloc(sizeof(matrix) * 3);
+    matrix **W = malloc(sizeof(matrix*) * 3);
     init_weights(W, sizes);
 
     FILE* neuron_file = NULL;
@@ -256,7 +256,7 @@ int main(int argc, char** argv)
         layers *input_2 = malloc(sizeof(layers));
         layers *input_3 = malloc(sizeof(layers));
         layers *input_4 = malloc(sizeof(layers));
-        layers **input_list = malloc(sizeof(layers) * 4);
+        layers **input_list = malloc(sizeof(layers*) * 4);
         input_list[0] = input_1;
         input_list[1] = input_2;
         input_list[2] = input_3;
@@ -266,16 +266,16 @@ int main(int argc, char** argv)
         double output_2[] = {1};
         double output_3[] = {1};
         double output_4[] = {0};
-        double **expected_outputs = malloc(sizeof(double) * 4);
+        double **expected_outputs = malloc(sizeof(double*) * 4);
         expected_outputs[0] = output_1;
         expected_outputs[1] = output_2;
         expected_outputs[2] = output_3;
         expected_outputs[3] = output_4;
 
-        for(size_t i = 0; i < 10000000000; i++)
+        for(size_t i = 0; i < 1000000000; i++)
         {
             printf("------------------------------------------------\n");
-            learn(input_list, layer_list, 0.01, expected_outputs, W, 4);
+            learn(input_list, layer_list, 0.05, expected_outputs, W, 4);
             printf("\n");
         }
         for(size_t i = 0; i < 4; i++)

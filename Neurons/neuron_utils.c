@@ -13,6 +13,28 @@ typedef struct{
     double* biases;
 } layers;
 
+void print_layer(layers *layer)
+{
+    printf("\nDepth = %lu\n", layer->depth);
+    printf("\nNeurons =");
+    for(size_t neuron = 0; neuron < layer->neuron_size; neuron++)
+        printf(" %f", layer->neurons[neuron]);
+    printf("\nBiases =");
+    for(size_t neuron = 0; neuron < layer->neuron_size; neuron++)
+        printf(" %f", layer->biases[neuron]);
+    printf("\n\n");
+}
+
+void print_weights(matrix *weights, size_t i)
+{
+    printf("\n");
+    for(size_t out = 0; out < weights->length; out++)
+        for(size_t in = 0; in < weights->width; in++)
+            printf("Weights n°%lu [%lu][%lu] = %f\n",
+                    i, out, in, weights->mat[out * weights->width + in]);
+    printf("\n");
+}
+
 double get_neuron(layers *layer, size_t i)
 {
     return *((layer->neurons) + i);
@@ -79,7 +101,7 @@ void init_weight(double *w, size_t *sizes, size_t i)
         for(size_t width = 0; width < *(sizes + i / 2); width++)
         {
             w[length * (*(sizes + i / 2)) + width] =
-                5.* ((double)rand() + (double)rand()) / (double)RAND_MAX;
+                20.* ((double)rand() / (double)RAND_MAX - 0.5f);
         }
     }
 }
@@ -262,7 +284,7 @@ void update_all_gradients(layers **input, matrix **W,
     double* weighted_1 = malloc(sizeof(double) * input[1]->neuron_size);
     double* weighted_2 = malloc(sizeof(double) * input[1]->neuron_size);
     double** weighted_neurons =
-        malloc(sizeof(double) * input[1]->neuron_size * 2);
+        malloc(sizeof(double*) * 2);
     weighted_neurons[0] = weighted_1;
     weighted_neurons[1] = weighted_2;
     double* weighted_outputs = malloc(sizeof(double) * input[3]->neuron_size);
@@ -354,9 +376,9 @@ void learn(layers **input_list, layers **layer_list, double learn_rate,
 {
     size_t input = 0;
     /*
-    matrix **grad_w = malloc(sizeof(matrix) * 3);
+    matrix **grad_w = malloc(sizeof(matrix*) * 3);
     double **grad_bias =
-        malloc((sizeof(double) * layer_list[1]->neuron_size) * 3);
+        malloc(sizeof(double*) * 3);
     for(size_t i = 0; i < 3; i++)
     {
         matrix *m = calloc(1, sizeof(matrix));
@@ -372,6 +394,11 @@ void learn(layers **input_list, layers **layer_list, double learn_rate,
         {
             for(size_t neuron = 0; neuron < layer_list[i]->neuron_size; neuron++)
                 layer_list[i]->neurons[neuron] = 0;
+            //print_layer(layer_list[i]);
+        }
+        for(size_t i = 0; i < 3; i++)
+        {
+            //print_weights(W[i], i);
         }
 
         printf("\n");
@@ -387,7 +414,7 @@ void learn(layers **input_list, layers **layer_list, double learn_rate,
                 max, layer_list[3]->neurons[0]);
         input += 1;
     }
-    if(layer_list[3]->neurons[0] > 0.4 && layer_list[3]->neurons[0] < 0.6)
-            shuffle(W, layer_list);
+    //if(layer_list[3]->neurons[0] > 0.4 && layer_list[3]->neurons[0] < 0.6)
+      //      shuffle(W, layer_list);
     //apply_gradients(learn_rate/input_number, layer_list, W, grad_w, grad_bias);
 }

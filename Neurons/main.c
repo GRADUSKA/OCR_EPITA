@@ -63,8 +63,8 @@ void read_neuron(FILE *file, layers **layer_list, matrix **W)
             while(c != ' ' && c != '\n' && c != '\0')
             {
                 value = 10 * value + c - '0';
-                div *= 10;
                 c = fgetc(file + i);
+                i++;
             }
             if(c == ' ')
             {
@@ -98,9 +98,8 @@ void read_neuron(FILE *file, layers **layer_list, matrix **W)
             while(c != ' ' && c != '\n' && c != '\0')
             {
                 value = 10 * value + c - '0';
-                div *= 10;
-                i++;
                 c = fgetc(file + i);
+                i++;
             }
             if(c == ' ')
             {
@@ -137,8 +136,9 @@ void write_neuron(FILE *file, layers **layer_list, matrix **W)
             else
             {
                 size_t j = 0;
-                while(j < 5)
+                while(j < 6)
                 {
+                    fputc(((int) value) % 10 + '0', p);
                     value *= 10;
                     fputc(((int) value) % 10 + '0', p);
                     j++;
@@ -161,8 +161,9 @@ void write_neuron(FILE *file, layers **layer_list, matrix **W)
             else
             {
                 size_t j = 0;
-                while(j < 5)
+                while(j < 6)
                 {
+                    fputc(((int) value) % 10 + '0', p);
                     value *= 10;
                     fputc(((int) value) % 10 + '0', p);
                     j++;

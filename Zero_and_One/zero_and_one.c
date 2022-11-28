@@ -64,6 +64,7 @@ void zeroandone(SDL_Surface* surface)
         }
 
     }
+    fputc('\0', file);
 
     SDL_UnlockSurface(surface);
     fclose(file);
@@ -91,7 +92,7 @@ int main(int argc, char** argv)
 {
     if(argc != 2)
     {
-        errx(EXIT_FAILURE, "Usage: image-file");
+        errx(EXIT_FAILURE, "Usage: image-file num");
     }
 
     // Initializes the SDL.

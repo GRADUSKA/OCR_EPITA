@@ -1,6 +1,7 @@
 #include <math.h>
 #include "use.h"
-
+#define highratio 0.4
+#define lowratio 0.33
 int Kx[] = {
     -1, 0, 1,
     -2, 0, 2,
@@ -131,7 +132,7 @@ double* non_max_suppr(SDL_Surface *surface, double* theta)
             int cell = i*surface->w+j;
 
             if((0 <= theta[cell] && theta[cell] < 22.5) || (157.5 <= theta[cell]
-                    && theta[cell] <= 180))
+                        && theta[cell] <= 180))
             {
                 q = pixels[cell+1];
                 r = pixels[cell-1];
@@ -165,6 +166,76 @@ double* non_max_suppr(SDL_Surface *surface, double* theta)
     return res;
 }
 
+char* double_threshold(SDL_Surface* s, double Low_ratio, double High_Ratio)
+{
+    int w = s->w;
+    int h = s->h;
+    int size = w*h;
+    double max = 0;
+    Uint32* pixels = s-> pixels;
+
+    for(int i = 0; i < size;i++)
+    {
+        if(pixels[i] > max)
+            max = pixels[i];
+    }
+
+    double Highthreshold = max * High_Ratio;
+    double Lowthreshold = Low_ratio * Highthreshold;
+
+    char* res = malloc(sizeof(char) * size);
+    for(int i = 0; i < size; i++)
+    {
+        if(pixels[i] > Highthreshold)
+            res[i] = 2;
+        else if(pixels[i] < Lowthreshold)
+            res[i] = 0;
+        else
+            res[i] = 1;
+    }
+
+    return res;
+}
+
+void hyperthesis(SDL_Surface* s)
+{
+    int w = s->w;
+    int h = s->h;
+
+    char* thresholds = double_threshold(s,lowratio,highratio);
+
+    Uint32* pixels = s->pixels;
+    for(int i = 0 ; i < w;i++)
+    {
+        for(int j = 0; j < h; j++)
+        {
+            if(thresholds[i*w+j] == 1)
+            {
+                for(int k = 0; k < 3;k++)
+                {
+                    for(int l = 0; l< 3;l++)
+                    {
+                        int _i_ = i + k - 1;
+                        int _j_ = j + l - 1;
+                        if(_i_ < 0)
+                            _i_ =0;
+                        if (_i_ >= s->h)
+                            _i_ = s->h-1;
+                        if(_j_ < 0)
+                            _j_ =0;
+                        if (_j_ >= s->w)
+                            _j_ = s->w-1;
+                        if(thresholds[_i_ * l + _j_] == 2)
+                            thresholds[i*w +j] = 2;
+                    }
+                }
+                if(thresholds[i*w+j] != 2)
+                    thresholds[i*w+j] = 0;
+                pixels[i*w+j] = (thresholds[i*w+j]/2) * 255;
+            }
+        }
+    }
+}
 int main(int argc, char** argv)
 {
     // Checks the number of arguments.
@@ -186,6 +257,7 @@ int main(int argc, char** argv)
         pixels[i]= SDL_MapRGB(s->format, nms[i],nms[i],nms[i]);
     }
     SDL_UnlockSurface(s);
+    hyperthesis(s);
     SDL_SaveBMP(s, "test_canny.bmp");
     free(nms);
     free(theta);

@@ -3,23 +3,27 @@
 #include <SDL2/SDL_image.h>
 
 
-int which(int c, Uint32* pixels, SDL_PixelFormat* format, int x, int y)
+int which(int c, int surf, int max, Uint32* pixels, SDL_PixelFormat* format, int x, int y)
 {
     int noir = 0;
     int blanc = 0;
-    for(int p = 0; p < x; p++)
+    for(int p = 0; p < y; p++)
     {
-        for(int q = 0; q < y; q++)
+        for(int q = 0; q < x; q++)
         {
             Uint8 r, g, b;
-            SDL_GetRGB(pixels[c+q+16*p], format, &r, &g, &b);
-            if(r == 255 && g == 255 && b == 255)
+            if(c+p+surf*q < max)
             {
-                blanc++;
-            }
-            else
-            {
-                noir++;
+                SDL_GetRGB(pixels[c+p+surf*q], format, &r, &g, &b);
+                if(r == 255 && g == 255 && b == 255)
+                {
+                    blanc++;
+                }
+                else
+                {
+                    noir++;
+                }
+            
             }
         }
     }
@@ -52,7 +56,7 @@ void zeroandone(SDL_Surface* surface)
     {
         for(int j = 0; j < surface->w; j+=x)
         {
-             int n = which(i*16+j, pixels, format, x, y);
+             int n = which(i*surface->w+j, surface->w, surface->w*surface->h, pixels, format, x, y);
              if(n == 1)
              {
                  fputc('1', file);
@@ -62,6 +66,7 @@ void zeroandone(SDL_Surface* surface)
                  fputc('0', file);
              }
         }
+        fputc('\n', file);
 
     }
     fputc('\0', file);

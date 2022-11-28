@@ -10,7 +10,7 @@ SRC = zero_and_one.c
 OBJ = ${SRC:.c=.o}
 EXE = ${SRC:.c=}
 
-zeroandone: zero_and_one.o
+zeroandone: zero_and_one
 .PHONY: clean
 
 clean:

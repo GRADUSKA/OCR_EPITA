@@ -33,7 +33,7 @@ int which(int c, Uint32* pixels, SDL_PixelFormat* format, int x, int y)
 
 void zeroandone(SDL_Surface* surface)
 {
-    FILE *file = fopen("zeroandone.txt","w");
+    FILE *file = fopen("zero_and_one.txt","w");
 
     Uint32* pixels = surface->pixels;
     if (pixels == NULL)
@@ -65,7 +65,6 @@ void zeroandone(SDL_Surface* surface)
 
     }
     fputc('\0', file);
-
     SDL_UnlockSurface(surface);
     fclose(file);
 }

@@ -15,10 +15,10 @@ void foreach_pixels(Uint32 pixel_color, SDL_PixelFormat* format,
             double rho = (double)x * cos(((double)t * M_PI)/180.) +
                (double) y * sin(((double)t* M_PI)/180.);
 
-            int _rho_ = rho + taille/2;
-            if(_rho_ >= 0 && _rho_ <= taille)
+            //int _rho_ = rho + taille/2;
+            if(rho>= 0) //&& _rho_ <= taille)
             {
-                tab[_rho_ * 360 + t]+=1;
+                tab[(int)rho * 360 + t]+=1;
             }
         }
     }
@@ -125,6 +125,75 @@ void event_loop()
     }
 }
 
+//a enlever
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+void drawHoughSpace(SDL_Surface* s,int w,int h,int* array)
+{
+    int w_s = s->w;
+    int h_s = s->h;
+
+    Uint32* pixels = s->pixels;
+
+    int max = 0;
+    for(int i = 0; i < (360 * sqrt((((w)*(w)))+((h)*(h))));i++)
+    {
+        if (max < array[i])
+            max = array[i];
+    }
+
+    for(int phi = 0; phi < h; phi++)
+    {
+        for(int deg = 0; deg < w; deg++)
+        {
+            if(array[phi * w + deg] / ((70*max)/100) != 0)
+            {
+                double rad = deg* M_PI / 180;
+                if((deg > 45 && deg <= 135) || (deg > 225 && deg <= 315))
+                {
+                    for(int x = 0; x < w_s; x++)
+                    {
+                        int y = ((phi)-x*cos(rad))/sin(rad);
+                        if (y < h_s && y > 0)
+                            pixels[y*w_s+x] = SDL_MapRGB(s->format,0,255,0);
+                    }
+                }
+                else
+                {
+                    for(int y = 0; y < h_s; y++)
+                    {
+                        int x = ((phi) - y * sin(rad)) / cos(rad);
+                        if(x < w_s && x > 0)
+                            pixels[y*w_s+x] = SDL_MapRGB(s->format,0,255,0);
+                    }
+                }
+            }
+        }
+    }
+}
+
+
 int main(int argc, char** argv)
 {
     // Checks the number of arguments.
@@ -158,6 +227,8 @@ int main(int argc, char** argv)
     int* tab = hough_function(s,&w,&h);
     SDL_Renderer* r = create_the_beautiful_function(tab,&w,&h);
     event_loop();
+    drawHoughSpace(s,w,h,tab);
+    SDL_SaveBMP(s,"merde.bmp");
     // Destroys the objects.
     SDL_DestroyRenderer(renderer);
     SDL_DestroyRenderer(r);

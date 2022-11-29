@@ -66,7 +66,7 @@ void zeroandone(SDL_Surface* surface)
                  fputc('0', file);
              }
         }
-        fputc('\n', file);
+        //fputc('\n', file);
 
     }
     fputc('\0', file);

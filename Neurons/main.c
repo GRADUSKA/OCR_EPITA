@@ -176,6 +176,11 @@ void write_neuron(FILE *file, layers **layer_list, matrix **W)
     fputc('\0', p);
 }
 
+void init_inputs_outputs(layers **input_list, double **expected_outputs, char *file)
+{
+
+}
+
 int main(int argc, char** argv)
 {
     srand(time(NULL));
@@ -194,7 +199,7 @@ int main(int argc, char** argv)
     else if (argv[1][0] == 'd')
     {
         sizes[0] = (size_t) 256;
-        sizes[1] = (size_t) 256;
+        sizes[1] = (size_t) 10;
         sizes[2] = (size_t) 9;
     }
     else
@@ -276,7 +281,7 @@ int main(int argc, char** argv)
         for(size_t i = 0; i < 1000000000; i++)
         {
             printf("------------------------------------------------\n");
-            learn(input_list, layer_list, 0.05, expected_outputs, W, 4);
+            learn(input_list, layer_list, 0.4, expected_outputs, W, 4);
             printf("\n");
         }
         for(size_t i = 0; i < 4; i++)
@@ -291,10 +296,29 @@ int main(int argc, char** argv)
     }
     else
     {
-        // a faire:
-        // - Lire le fichier de données
-        // - Faire 2 listes, les input et les resultats
-        // - Learn sur tous
+        size_t input_number = 9;
+        layers **input_list = malloc(sizeof(layers*) * input_number);
+        for(size_t i = 0, i < input_number; i++)
+        {
+            layers *input = malloc(sizeof(layers)*);
+        }
+        init_inputs_outputs(input_list, expected_outputst, argv[3]);
+        for(size_t i = 0; i < 100000000; i++)
+        {
+            printf("------------------------------------------------\n");
+            learn(input_list, layer_list, 0.4, expected_outputs, W, 4);
+            printf("\n");
+        }
+
+        for(size_t i = 0; i < 4; i++)
+        {
+            for(size_t j = 0; j < W[i]->length * W[i]->width; j++)
+                printf("%f ", W[i]->mat[j]);
+            printf("\n");
+        }
+
+        neuron_file = fopen(argv[2], "w");
+        write_neuron(neuron_file, layer_list, W);
     }
 
     return 1;

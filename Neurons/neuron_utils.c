@@ -101,7 +101,7 @@ void init_weight(double *w, size_t *sizes, size_t i)
         for(size_t width = 0; width < *(sizes + i / 2); width++)
         {
             w[length * (*(sizes + i / 2)) + width] =
-                20.* ((double)rand() / (double)RAND_MAX - 0.5f);
+                10.* ((double)rand() / (double)RAND_MAX - 0.5f);
         }
     }
 }
@@ -416,5 +416,6 @@ void learn(layers **input_list, layers **layer_list, double learn_rate,
     }
     //if(layer_list[3]->neurons[0] > 0.4 && layer_list[3]->neurons[0] < 0.6)
       //      shuffle(W, layer_list);
-    //apply_gradients(learn_rate/input_number, layer_list, W, grad_w, grad_bias);
+    //else
+      //  apply_gradients(learn_rate/input_number, layer_list, W, grad_w, grad_bias);
 }

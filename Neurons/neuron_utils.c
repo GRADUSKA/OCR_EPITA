@@ -185,7 +185,7 @@ double cost(layers *outputs, double *expected_output, size_t output)
 
 double cost_derivative(size_t output_change, layers *layer,
         double *expected_outputs){
-    return (expected_outputs[output_change] - layer->neurons[output_change]);
+    return 2*(expected_outputs[output_change] - layer->neurons[output_change]);
 }
 
 double sigmoid_derivative(double z)
@@ -396,22 +396,24 @@ void learn(layers **input_list, layers **layer_list, double learn_rate,
                 layer_list[i]->neurons[neuron] = 0;
             //print_layer(layer_list[i]);
         }
-        for(size_t i = 0; i < 3; i++)
-        {
+        //for(size_t i = 0; i < 3; i++)
+        //{
             //print_weights(W[i], i);
-        }
+        //}
 
         printf("\n");
         layer_list[0]->neurons = input_list[input]->neurons;
-        printf("input = %i %i\n",
-                (int)layer_list[0]->neurons[0], (int)layer_list[0]->neurons[1]);
+        printf("input = %lu\n",input % 9 + 1);
         update_all_gradients(layer_list, W, expected_outputs[input],
                 learn_rate);
         size_t max = 0;
-        if(0.5 < layer_list[3]->neurons[0])
-            max = 1;
+        for(size_t i = 1; i < 9; i++)
+        {
+            if(layer_list[3]->neurons[i] > layer_list[3]->neurons[max])
+                max = i;
+        }
         printf("result = %lu\npercentage = %f\n",
-                max, layer_list[3]->neurons[0]);
+                max + 1, layer_list[3]->neurons[max]);
         input += 1;
     }
     //if(layer_list[3]->neurons[0] > 0.4 && layer_list[3]->neurons[0] < 0.6)

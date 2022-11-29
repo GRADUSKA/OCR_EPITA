@@ -48,7 +48,6 @@ void init_xor(layers **input_list)
 
 void read_neuron(FILE *file, layers **layer_list, matrix **W)
 {
-    size_t i = 0;
     size_t div = 1;
     double value = 0;
     char c = fgetc(file);
@@ -56,65 +55,56 @@ void read_neuron(FILE *file, layers **layer_list, matrix **W)
     for(size_t num = 0; c != '\0' && num < 3; num++)
     {
         j = 0;
-
         while(c != '\0' && c != '\n' && j < W[num]->width * W[num]->length)
         {
             div = 1;
             while(c != ' ' && c != '\n' && c != '\0')
             {
                 value = 10 * value + c - '0';
-                c = fgetc(file + i);
-                i++;
+                c = fgetc(file);
             }
             if(c == ' ')
             {
-                i++;
-                c = fgetc(file + i);
+                c = fgetc(file);
             }
             W[num]->mat[j] = value / div;
             j++;
         }
-        if(value != 0 && i < W[num]->width * W[num]->length)
+        if(value != 0 && j < W[num]->width * W[num]->length)
             W[num]->mat[j] = value / div;
         if(c == '\n')
         {
-            i++;
-            c = fgetc(file + i);
+            c = fgetc(file);
         }
     }
     if(c == '\n')
     {
-        i++;
-        c = fgetc(file + i);
+        c = fgetc(file);
     }
     size_t num = 1;
     for(; c != '\0' && num < 4; num++)
     {
         j = 0;
-
         while(c != '\0' && c != '\n' && j < layer_list[num]->neuron_size)
         {
             div = 1;
             while(c != ' ' && c != '\n' && c != '\0')
             {
                 value = 10 * value + c - '0';
-                c = fgetc(file + i);
-                i++;
+                c = fgetc(file);
             }
             if(c == ' ')
             {
-                i++;
-                c = fgetc(file + i);
+                c = fgetc(file);
             }
             layer_list[num]->biases[j] = value / div;
             j++;
         }
-        if(value != 0 && i < layer_list[num]->neuron_size)
+        if(value != 0 && j < layer_list[num]->neuron_size)
             layer_list[num]->biases[j] = value / div;
         if(c == '\n')
         {
-            i++;
-            c = fgetc(file + i);
+            c = fgetc(file);
         }
     }
     if(j < layer_list[num]->neuron_size && num < 4)
@@ -144,7 +134,6 @@ void write_neuron(FILE *file, layers **layer_list, matrix **W)
                     j++;
                 }
             }
-
             fputc(' ', p);
         }
         fputc('\n', p);
@@ -176,9 +165,25 @@ void write_neuron(FILE *file, layers **layer_list, matrix **W)
     fputc('\0', p);
 }
 
-void init_inputs_outputs(layers **input_list, double **expected_outputs, char *file)
+void init_inputs_outputs(layers **input_list, double **expected_outputs, char *file, size_t input_number)
 {
-
+    FILE *f = fopen(file, "r");
+    for(size_t i = 0; i < input_number; i++)
+    {
+        double *neurons = malloc(sizeof(double) * 256);
+        for(size_t j = 0; j < 256; j++)
+        {
+            neurons[j] = fgetc(f);
+        }
+        char c = fgetc(f);
+        while(c != '\n' && c != '\0')
+            c = fgetc(f);
+        input_list[i]->neurons = neurons;
+        input_list[i]->neuron_size = 256;
+        input_list[i]->depth = 0;
+        expected_outputs[i] = calloc(9, sizeof(double));
+        expected_outputs[i][i % 9] = 1;
+    }
 }
 
 int main(int argc, char** argv)
@@ -199,7 +204,7 @@ int main(int argc, char** argv)
     else if (argv[1][0] == 'd')
     {
         sizes[0] = (size_t) 256;
-        sizes[1] = (size_t) 10;
+        sizes[1] = (size_t) 20;
         sizes[2] = (size_t) 9;
     }
     else
@@ -298,15 +303,17 @@ int main(int argc, char** argv)
     {
         size_t input_number = 9;
         layers **input_list = malloc(sizeof(layers*) * input_number);
-        for(size_t i = 0, i < input_number; i++)
+        for(size_t i = 0; i < input_number; i++)
         {
-            layers *input = malloc(sizeof(layers)*);
+            input_list[i] = malloc(sizeof(layers*));
         }
-        init_inputs_outputs(input_list, expected_outputst, argv[3]);
+        double **expected_outputs = malloc(sizeof(double*) * input_number);
+
+        init_inputs_outputs(input_list, expected_outputs, argv[3], input_number);
         for(size_t i = 0; i < 100000000; i++)
         {
             printf("------------------------------------------------\n");
-            learn(input_list, layer_list, 0.4, expected_outputs, W, 4);
+            learn(input_list, layer_list, 0.1, expected_outputs, W, input_number);
             printf("\n");
         }
 

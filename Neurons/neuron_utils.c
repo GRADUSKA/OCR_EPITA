@@ -98,12 +98,12 @@ void init_layers(layers **layer_list, size_t *sizes)
     *(layer_list + 3) = output_layer;
 }
 
-void init_weight(double *w, size_t *sizes, size_t i)
+void init_weight(double *w, size_t in, size_t out)
 {
-    for(size_t length = 0; length < *(sizes + ((i + 1) / 2)); length++){
-        for(size_t width = 0; width < *(sizes + i / 2); width++)
+    for(size_t length = 0; length < out; length++){
+        for(size_t width = 0; width < in; width++)
         {
-            w[length * (*(sizes + i / 2)) + width] =
+            w[length * in + width] =
                 0.06 * ((double)rand() / (double)RAND_MAX - 0.5f);
         }
     }
@@ -117,9 +117,9 @@ void init_weights(matrix **W, size_t *sizes)
     double *mat1 = malloc(memory_1 * sizeof(double));
     double *mat2 = malloc(memory_2 * sizeof(double));
     double *mat3 = malloc(memory_3 * sizeof(double));
-    init_weight(mat1, sizes, 1);
-    init_weight(mat2, sizes, 2);
-    init_weight(mat3, sizes, 3);
+    init_weight(mat1, sizes[0], sizes[1]);
+    init_weight(mat2, sizes[1], sizes[2]);
+    init_weight(mat3, sizes[2], sizes[3]);
     matrix *W1 = malloc(sizeof(matrix));
     matrix *W2 = malloc(sizeof(matrix));
     matrix *W3 = malloc(sizeof(matrix));

@@ -173,7 +173,11 @@ void init_inputs_outputs(layers **input_list, double **expected_outputs, char *f
         double *neurons = malloc(sizeof(double) * 256);
         for(size_t j = 0; j < 256; j++)
         {
-            neurons[j] = fgetc(f);
+            //if(j % 16 == 0)
+              //  printf("\n");
+            char c = fgetc(f);
+            //printf("%c", c);
+            neurons[j] = c - '0';
         }
         char c = fgetc(f);
         while(c != '\n' && c != '\0')
@@ -199,13 +203,15 @@ int main(int argc, char** argv)
     {
         sizes[0] = (size_t) 2;
         sizes[1] = (size_t) 4;
-        sizes[2] = (size_t) 1;
+        sizes[2] = (size_t) 4;
+        sizes[3] = (size_t) 1;
     }
     else if (argv[1][0] == 'd')
     {
         sizes[0] = (size_t) 256;
-        sizes[1] = (size_t) 20;
-        sizes[2] = (size_t) 9;
+        sizes[1] = (size_t) 128;
+        sizes[2] = (size_t) 64;
+        sizes[3] = (size_t) 9;
     }
     else
         exit_help();
@@ -286,7 +292,7 @@ int main(int argc, char** argv)
         for(size_t i = 0; i < 1000000000; i++)
         {
             printf("------------------------------------------------\n");
-            learn(input_list, layer_list, 0.4, expected_outputs, W, 4);
+            learn(input_list, layer_list, 0.4, expected_outputs, W, 4, i);
             printf("\n");
         }
         for(size_t i = 0; i < 4; i++)
@@ -310,13 +316,16 @@ int main(int argc, char** argv)
         double **expected_outputs = malloc(sizeof(double*) * input_number);
 
         init_inputs_outputs(input_list, expected_outputs, argv[3], input_number);
-        for(size_t i = 0; i < 100000000; i++)
+
+        
+        for(size_t i = 0; i < 1000000000; i++)
         {
             printf("------------------------------------------------\n");
-            learn(input_list, layer_list, 0.1, expected_outputs, W, input_number);
+            learn(input_list, layer_list, 0.01, expected_outputs, W, input_number, i);
             printf("\n");
         }
-
+        
+        /*
         for(size_t i = 0; i < 4; i++)
         {
             for(size_t j = 0; j < W[i]->length * W[i]->width; j++)
@@ -326,6 +335,7 @@ int main(int argc, char** argv)
 
         neuron_file = fopen(argv[2], "w");
         write_neuron(neuron_file, layer_list, W);
+        */
     }
 
     return 1;

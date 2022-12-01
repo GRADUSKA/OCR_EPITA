@@ -49,19 +49,22 @@ void init_layers(layers **layer_list, size_t *sizes)
 
     double *in_list = calloc(sizes[0], sizeof(double));
     double *hid_list1 = calloc(sizes[1], sizeof(double));
-    double *hid_list2 = calloc(sizes[1], sizeof(double));
-    double *out_list = calloc(sizes[2], sizeof(double));
+    double *hid_list2 = calloc(sizes[2], sizeof(double));
+    double *out_list = calloc(sizes[3], sizeof(double));
 
     double *b1 = malloc(sizes[1] * sizeof(double));
-    double *b2 = malloc(sizes[1] * sizeof(double));
-    double *b3 = malloc(sizes[2] * sizeof(double));
+    double *b2 = malloc(sizes[2] * sizeof(double));
+    double *b3 = malloc(sizes[3] * sizeof(double));
 
     for(size_t out = 0; out < sizes[1]; out++){
         b1[out] = 0;//((double)rand() + (double)rand()) / (double)RAND_MAX;
-        b2[out] = 0;//((double)rand() + (double)rand()) / (double)RAND_MAX;
     }
 
     for(size_t out = 0; out < sizes[2]; out++){
+        b2[out] = 0;
+    }
+
+    for(size_t out = 0; out < sizes[3]; out++){
         b3[out] = 0;//((double)rand() + (double)rand()) / (double)RAND_MAX;
     }
 
@@ -73,12 +76,12 @@ void init_layers(layers **layer_list, size_t *sizes)
     input_layer->input_size = 0;
     hidden_layer1->input_size = *sizes;
     hidden_layer2->input_size = *(sizes + 1);
-    output_layer->input_size = *(sizes + 1);
+    output_layer->input_size = *(sizes + 2);
 
     input_layer->neuron_size = sizes[0];
     hidden_layer1->neuron_size = sizes[1];
-    hidden_layer2->neuron_size = sizes[1];
-    output_layer->neuron_size = sizes[2];
+    hidden_layer2->neuron_size = sizes[2];
+    output_layer->neuron_size = sizes[3];
 
     input_layer->neurons = in_list;
     hidden_layer1->neurons = hid_list1;
@@ -101,7 +104,7 @@ void init_weight(double *w, size_t *sizes, size_t i)
         for(size_t width = 0; width < *(sizes + i / 2); width++)
         {
             w[length * (*(sizes + i / 2)) + width] =
-                10.* ((double)rand() / (double)RAND_MAX - 0.5f);
+                0.06 * ((double)rand() / (double)RAND_MAX - 0.5f);
         }
     }
 }
@@ -109,8 +112,8 @@ void init_weight(double *w, size_t *sizes, size_t i)
 void init_weights(matrix **W, size_t *sizes)
 {
     size_t memory_1 = *(sizes + 1) * *sizes;
-    size_t memory_2 = *(sizes + 1) * *(sizes + 1);
-    size_t memory_3 = *(sizes + 2) * *(sizes + 1);
+    size_t memory_2 = *(sizes + 2) * *(sizes + 1);
+    size_t memory_3 = *(sizes + 3) * *(sizes + 2);
     double *mat1 = malloc(memory_1 * sizeof(double));
     double *mat2 = malloc(memory_2 * sizeof(double));
     double *mat3 = malloc(memory_3 * sizeof(double));
@@ -121,8 +124,8 @@ void init_weights(matrix **W, size_t *sizes)
     matrix *W2 = malloc(sizeof(matrix));
     matrix *W3 = malloc(sizeof(matrix));
     *W1 = (matrix) {.mat = mat1,.length = *(sizes + 1),.width = *sizes};
-    *W2 = (matrix) {.mat = mat2,.length = *(sizes + 1),.width = *(sizes + 1)};
-    *W3 = (matrix) {.mat = mat3,.length = *(sizes + 2),.width = *(sizes + 1)};
+    *W2 = (matrix) {.mat = mat2,.length = *(sizes + 2),.width = *(sizes + 1)};
+    *W3 = (matrix) {.mat = mat3,.length = *(sizes + 3),.width = *(sizes + 2)};
 
     *W = W1;
     *(W + 1) = W2;
@@ -282,7 +285,7 @@ void update_all_gradients(layers **input, matrix **W,
         double *expected_output, double learn_rate)
 {
     double* weighted_1 = malloc(sizeof(double) * input[1]->neuron_size);
-    double* weighted_2 = malloc(sizeof(double) * input[1]->neuron_size);
+    double* weighted_2 = malloc(sizeof(double) * input[2]->neuron_size);
     double** weighted_neurons =
         malloc(sizeof(double*) * 2);
     weighted_neurons[0] = weighted_1;
@@ -364,15 +367,16 @@ void shuffle(matrix **W, layers **layer_list)
         {
             for(size_t in = 0; in < layer_list[i]->neuron_size; in++)
             {
-                W[i]->mat[out * layer_list[i]->neuron_size + in] = (double)rand() / (double)RAND_MAX;
+                W[i]->mat[out * layer_list[i]->neuron_size + in] =
+                    0.06 * ((double)rand() / (double)RAND_MAX - 0.5f);
             }
-            layer_list[i+1]->biases[out] = (double)rand() / (double)RAND_MAX;
+            layer_list[i+1]->biases[out] = 0;
         }
     }
 }
 
 void learn(layers **input_list, layers **layer_list, double learn_rate,
-        double **expected_outputs, matrix **W, size_t input_number)
+        double **expected_outputs, matrix **W, size_t input_number, size_t iteration)
 {
     size_t input = 0;
     /*
@@ -390,6 +394,7 @@ void learn(layers **input_list, layers **layer_list, double learn_rate,
     */
     while(input < input_number)
     {
+        size_t num = rand() % 9;
         for(size_t i = 1; i < 4; i++)
         {
             for(size_t neuron = 0; neuron < layer_list[i]->neuron_size; neuron++)
@@ -402,9 +407,9 @@ void learn(layers **input_list, layers **layer_list, double learn_rate,
         //}
 
         printf("\n");
-        layer_list[0]->neurons = input_list[input]->neurons;
-        printf("input = %lu\n",input % 9 + 1);
-        update_all_gradients(layer_list, W, expected_outputs[input],
+        layer_list[0]->neurons = input_list[num]->neurons;
+        printf("input = %lu\n",num + 1);
+        update_all_gradients(layer_list, W, expected_outputs[num],
                 learn_rate);
         size_t max = 0;
         for(size_t i = 1; i < 9; i++)
@@ -414,6 +419,12 @@ void learn(layers **input_list, layers **layer_list, double learn_rate,
         }
         printf("result = %lu\npercentage = %f\n",
                 max + 1, layer_list[3]->neurons[max]);
+
+        if(iteration % 500 == 0 && expected_outputs[input][max] == 0)
+        {
+            //shuffle(W, layer_list);
+        }
+
         input += 1;
     }
     //if(layer_list[3]->neurons[0] > 0.4 && layer_list[3]->neurons[0] < 0.6)

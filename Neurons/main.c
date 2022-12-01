@@ -197,7 +197,7 @@ int main(int argc, char** argv)
     if(argc != 4 && argc != 5)
         exit_help();
 
-    size_t *sizes = malloc(sizeof(size_t) * 3);
+    size_t *sizes = malloc(sizeof(size_t) * 4);
 
     if(argv[1][0] == 'x')
     {

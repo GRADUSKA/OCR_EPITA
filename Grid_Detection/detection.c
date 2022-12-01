@@ -7,46 +7,40 @@
 //2 : j'affiche mal mes lignes
 
 
-void foreach_pixels(Uint32 pixel_color, SDL_PixelFormat* format,
-        int* tab, float x, float y,int height)
+void foreach_pixels(int* tab, float x, float y,int height)
 {
-    Uint8 r, g, b;
-    SDL_GetRGB(pixel_color, format, &r, &g, &b);
-    if (r > 0 && b > 0 && g > 0)
+    for(int t = 0; t < 360; t++)
     {
-        for(int t = 0; t < 360; t++)
-        {
-            double radian = t*M_PI/180;
-            int rho = x * cos(radian) + y * sin(radian);
-            tab[(rho + (height/2)) + t * 360]+=1;
-        }
+        double radian = t*M_PI/180;
+        int rho = x * cos(radian) + y * sin(radian);
+        tab[(rho + height/2)*360 + t]+=1;
     }
 }
 
-int* hough_function(SDL_Surface* surface, int* w, int* h)
+int* hough_function(SDL_Surface* surface)
 {
     // Take the weight and height of my pixels
     Uint32* pixels = surface->pixels;
-    *w = surface->w;
-    *h = surface->h;
+    int w = surface->w;
+    int h = surface->h;
 
 
     //Create the matrice
     int width = 360;
-    int height = 2 * sqrt((*w)*(*w) + (*h)*(*h));
+    int height = 2 * sqrt((w*w) + (h*h));
     int* tab = calloc((width * height),sizeof(int));
-    SDL_PixelFormat* format = surface->format;
 
     if(SDL_LockSurface(surface) != 0)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
     SDL_LockSurface(surface);
 
     // Try if a pixel is important or not and if it is, continue in another function
-    for(int y = 0; y < (*h); y++)
+    for(int y = 0; y < h; y++)
     {
-        for(int x = 0; x < (*w); x++)
+        for(int x = 0; x < w; x++)
         {
-            foreach_pixels(pixels[(*w)*y + x],format,tab,(float)x,(float)y, height);
+            if (pixels[x + y*w] != 0)
+                foreach_pixels(tab,x,y, height);
         }
     }
 
@@ -79,15 +73,17 @@ int* hough_function(SDL_Surface* surface, int* w, int* h)
 //
 //
 //
-void drawHoughSpace(SDL_Surface* s,int w,int h,int* array)
+void drawHoughSpace(SDL_Surface* s,int* array)
 {
     int w_s = s->w;
     int h_s = s->h;
+    int w = 360;
+    int h = sqrt((w_s * w_s) + (h_s * h_s))*2;
 
     Uint32* pixels = s->pixels;
 
-    int max = 0;
-    for(int i = 0; i < (2 * 360 * sqrt((w_s*w_s) + (h_s*h_s)));i++)
+    int max = array[0];
+    for(int i = 0; i < (w*h);i++)
     {
         if (max < array[i])
             max = array[i];
@@ -97,14 +93,14 @@ void drawHoughSpace(SDL_Surface* s,int w,int h,int* array)
     {
         for(int x_tab = 0; x_tab < w; x_tab++)
         {
-            if((array[y_tab * w + x_tab]) / ((70 * max)/100) != 0)
+            if((array[y_tab * w + x_tab]) / ((90 * max)/100) != 0)
             {
                 double rad = x_tab* M_PI / 180;
                 if((x_tab > 45 && x_tab <= 135) || (x_tab > 225 && x_tab <= 315))
                 {
                     for(int x = 0; x < w_s; x++)
                     {
-                        int y = ((y_tab - h/2) - x*cos(rad))/sin(rad);
+                        int y = ((y_tab - h/2) - x*cos(rad)) / sin(rad);
                         if (y < h_s && y > 0)
                             pixels[y * w_s + x] = SDL_MapRGB(s->format,0,255,0);
                     }
@@ -132,10 +128,8 @@ int main(int argc, char** argv)
     SDL_Surface* s = load_image(argv[1]);
 
     //Call the hough function
-    int w = 0;
-    int h = 0;
-    int* tab = hough_function(s,&w,&h);
-    drawHoughSpace(s,w,h,tab);
+    int* tab = hough_function(s);
+    drawHoughSpace(s,tab);
     SDL_SaveBMP(s,"merde.bmp");
 
     // Destroys the objects.

@@ -4,9 +4,9 @@
 
 
 void to_case(SDL_Surface* surface, char name[], char where[], int x, int y, int w, int h)
-{   
-    // to change : the width and the heigh by the real 
-    SDL_Surface* new_surface = SDL_CreateRGBSurface(0, w, h, 32, 0, 0, 0, 0); 
+{
+    // to change : the width and the heigh by the real
+    SDL_Surface* new_surface = SDL_CreateRGBSurface(0, w, h, 32, 0, 0, 0, 0);
 
     Uint32* pixels = surface->pixels;
     if (pixels == NULL)
@@ -21,13 +21,13 @@ void to_case(SDL_Surface* surface, char name[], char where[], int x, int y, int 
     SDL_LockSurface(new_surface);
 
     //position "x" of the first pixel of the case in the grid
-    int k = x; 
-        
+    int k = x;
+
     for(int i = 0; i < new_surface->h; i++)
     {
         // position "y" of the first pixel of the case in the grid
         int l = y;
-        
+
         for(int j = 0; j < new_surface->w; j++)
         {
             new_pixels[i*new_surface->w+j] = pixels[k*surface->w+l];
@@ -37,7 +37,7 @@ void to_case(SDL_Surface* surface, char name[], char where[], int x, int y, int 
     }
 
     int z = 0;
-    char new[11];
+    char new[12];
     while(name[z] != '\0')
     {
         new[z] = name[z];
@@ -54,6 +54,8 @@ void to_case(SDL_Surface* surface, char name[], char where[], int x, int y, int 
     new[z] = 'm';
     z++;
     new[z] = 'p';
+    z++;
+    new[z] = '\0';
 
 
     SDL_SaveBMP(new_surface, new);

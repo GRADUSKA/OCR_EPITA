@@ -52,9 +52,11 @@ void zeroandone(SDL_Surface* surface)
 
     SDL_LockSurface(surface);
 
-    for(int i = 0; i < surface->h; i+=y)
+    size_t h = 0;
+    for(int i = 0; h < 16; i+=y, h++)
     {
-        for(int j = 0; j < surface->w; j+=x)
+        size_t w = 0;
+        for(int j = 0; w < 16; j+=x, w++)
         {
              int n = which(i*surface->w+j, surface->w, surface->w*surface->h, pixels, format, x, y);
              if(n == 1)

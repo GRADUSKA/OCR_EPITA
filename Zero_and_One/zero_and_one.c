@@ -15,7 +15,7 @@ int which(int c, int surf, int max, Uint32* pixels, SDL_PixelFormat* format, int
             if(c+p+surf*q < max)
             {
                 SDL_GetRGB(pixels[c+p+surf*q], format, &r, &g, &b);
-                if(r == 255 && g == 255 && b == 255)
+                if(r >= 128 && g >= 128 && b >= 128)
                 {
                     blanc++;
                 }
@@ -44,21 +44,45 @@ void zeroandone(SDL_Surface* surface)
     {
         errx(EXIT_FAILURE, "%s", SDL_GetError());
     }
+    int base_x = 0;
+    int base_y = 0;
+    int max_x = surface->w;
+    int max_y = surface->h;
+    if(max_x % 2)
+        max_x++;
+    if(max_y % 2)
+        max_y++;
+    for(int alt = 0; (max_x - base_x) % 16; alt = !alt)
+    {
+        if(alt)
+            max_x += 2;
+        else
+            base_x -= 2;
+    }
+    for(int alt = 0; (max_y - base_y) % 16; alt = !alt)
+    {
+        if(alt)
+            max_y += 2;
+        else
+            base_y -= 2;
+    }
+    int width = max_x - base_x;
+    int height = max_y - base_y;
 
-    int x = (surface->w)/16;
-    int y = (surface->h)/16;
+    int x = width/16;
+    int y = height/16;
 
     SDL_PixelFormat* format = surface->format;
 
     SDL_LockSurface(surface);
 
     size_t h = 0;
-    for(int i = 0; h < 16; i+=y, h++)
+    for(int i = base_y; h < 16; i+=y, h++)
     {
         size_t w = 0;
-        for(int j = 0; w < 16; j+=x, w++)
+        for(int j = base_x; w < 16; j+=x, w++)
         {
-             int n = which(i*surface->w+j, surface->w, surface->w*surface->h, pixels, format, x, y);
+             int n = which(i*width+j, width, width*height, pixels, format, x, y);
              if(n == 1)
              {
                  fputc('1', file);
@@ -68,7 +92,7 @@ void zeroandone(SDL_Surface* surface)
                  fputc('0', file);
              }
         }
-        //fputc('\n', file);
+        fputc('\n', file);
 
     }
     fputc('\0', file);

@@ -1,0 +1,15 @@
+window
+{
+    background-color : #0a6a70;
+}
+
+button
+{
+    color : #0a6a70;
+    border-width : 5px;
+}
+
+label
+{
+    font-size: 30px;
+}

@@ -12,10 +12,10 @@ EXE = main
 
 
 main: $(OBJ)
-	$(CC) $(CFLAGS) $^ -o $@ -lm
+	$(CC) $(CFLAGS) $^ -o $@  `pkg-config --libs sdl2 SDL2_image` -lm
 
 %.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@ -lm
+	$(CC) $(CFLAGS) -c $< -o $@  `pkg-config --libs sdl2 SDL2_image` -lm
 
 .PHONY: clean
 

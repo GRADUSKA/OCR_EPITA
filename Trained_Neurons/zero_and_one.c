@@ -1,7 +1,4 @@
-#include <err.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include "neuron_utils.h"
+#include "zero_and_one.h"
 
 
 int which(int c, int surf, int max, Uint32* pixels, SDL_PixelFormat* format, int x, int y)

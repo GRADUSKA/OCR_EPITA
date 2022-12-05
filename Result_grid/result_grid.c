@@ -2,65 +2,62 @@
 #include <stdlib.h>
 #include <err.h>
 #include <SDL2/SDL.h>
+#include "use.h"
 
-void draw_digits(SDL_Surface surface, char* sudoku_file, char* result_file)
+void draw(SDL_Renderer* renderer, int w, int h)
 {
-    FILE *sudoku = fopen(sudoku_file, "r");
-    if(sudoku == NULL)
-    {
-        printf("Erreur fopen\n");
-        return 1;
-    }
+    // Clears the renderer (sets the background to black).
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
 
-    FILE *result = fopen(result_file, "r");
-    if(result  == NULL)
-    {
-        printf("Erreur fopen\n");
-        return 1;
-    }
-    SDL_LockSurface(surface);
+    // Sets the color for drawing operations to white.
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
+    // Draws the two diagonals.
+    SDL_RenderDrawLine(renderer, 0, 0, w, h);
+    SDL_RenderDrawLine(renderer, 0, h, w, 0);
 
-
-
-
-    SDL_UnlockSurface(surface);
-    fclose(sudoku);
-    fclose(result);
+    // Updates the display.
+    SDL_RenderPresent(renderer);
 }
-
-
 
 int main(int argc, char** argv)
 {
     // Checks the number of arguments.
-    if (argc != 4)
+    if (argc != 2)
         errx(EXIT_FAILURE, "Usage: image-file");
 
-    // Initializes the SDL.
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
 
     // Creates a window.
-    SDL_Window* window = SDL_CreateWindow("Plain Window", 0, 0, 0, 0,
+    SDL_Window* window = SDL_CreateWindow("RESULT", 0, 0, 100, 100,
             SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+
     if (window == NULL)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
 
-    // Creates a renderer.
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    // Creates a renderer
+    SDL_Renderer* renderer =
+        SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+
     if (renderer == NULL)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
 
-    // - Create a surface.
-    SDL_Surface* surface = load_image(argv[1]);
+    SDL_Surface* s = load_image(argv[1]);
+    SDL_Texture* t =  SDL_CreateTextureFromSurface(renderer, s);
 
-    draw_digits(surface, argv[2], argv[3]);
+    draw(renderer,s->w,s->h);
 
+    if(SDL_SaveBMP(s, "test_grayscale.bmp"))
+        printf("ERROR: %s", SDL_GetError());
+    SDL_FreeSurface(s);
     // Destroys the objects.
     SDL_DestroyRenderer(renderer);
+    SDL_DestroyTexture(t);
     SDL_DestroyWindow(window);
     SDL_Quit();
+
 
     return EXIT_SUCCESS;
 }

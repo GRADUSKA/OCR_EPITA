@@ -205,9 +205,9 @@ void hyperthesis(SDL_Surface* s)
     char* thresholds = double_threshold(s,lowratio,highratio);
 
     Uint32* pixels = s->pixels;
-    for(int i = 0 ; i < w;i++)
+    for(int i = 0 ; i < h;i++)
     {
-        for(int j = 0; j < h; j++)
+        for(int j = 0; j < w; j++)
         {
             if(thresholds[i*w+j] == 1)
             {
@@ -264,8 +264,8 @@ int main(int argc, char** argv)
     SDL_FreeSurface(s);
 
     // Destroys the objects.
-    SDL_Quit();
+    SDL_Quit(); 
 
-
+    /*😃 ❤️  😡*/ 
     return EXIT_SUCCESS;
-}
+} 

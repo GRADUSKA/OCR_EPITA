@@ -8,6 +8,7 @@
 #include "neuron_utils.h"
 #include "mat_utils.h"
 #include "zero_and_one.h"
+
 #define PATH_MAX 4096
 
 void exit_help()
@@ -178,11 +179,11 @@ int main(int argc, char** argv)
         fclose(neuron_file);
     }
 
-    if(argv[0][0] != 'l')
+    if(argv[1][0] != 'l')
     {
         if(!neuron_file)
             exit_help_2();
-        transform(argv[0], layer_list[0]);
+        transform(argv[1], layer_list[0]);
         compute(layer_list, W);
         size_t max = 0;
         for(size_t i = 1; i < sizes[3]; i++)
@@ -194,7 +195,7 @@ int main(int argc, char** argv)
     {
         size_t input_number = 0;
         DIR* d;
-        const char *d_name = "training_data";
+        const char *d_name = "training_data/";
         d = opendir(d_name);
         if(!d)
             exit_help_3();
@@ -207,6 +208,7 @@ int main(int argc, char** argv)
             char dir_name[PATH_MAX + 1];
             strcpy(dir_name, d_name);
             strcat(dir_name, dir->d_name);
+            strcat(dir_name, "/");
             di = opendir(dir_name);
             while((file = readdir(di)))
                 input_number++;
@@ -214,7 +216,6 @@ int main(int argc, char** argv)
         }
         closedir(d);
         input_number *= 9;
-
         layers **input_list = malloc(sizeof(layers*) * input_number);
         double **expected_outputs = malloc(sizeof(double*) * input_number);
         for(size_t i = 0; i < input_number; i++)
@@ -223,7 +224,6 @@ int main(int argc, char** argv)
             expected_outputs[i] = calloc(9, sizeof(double));
             expected_outputs[i][i % 9] = 1;
         }
-
         d = opendir(d_name);
         size_t num = 0;
         while((dir = readdir(d)))
@@ -232,6 +232,7 @@ int main(int argc, char** argv)
             char dir_name[PATH_MAX + 1];
             strcpy(dir_name, d_name);
             strcat(dir_name, dir->d_name);
+            strcat(dir_name, "/");
             di = opendir(dir_name);
             if(dir->d_type)
             {
@@ -244,14 +245,13 @@ int main(int argc, char** argv)
                     transform(file_name, input_list[i * 9 + num]);
                     i++;
                 }
+                num++;
             }
             closedir(di);
-            num++;
         }
-        
-        for(size_t i = 0; i < 200; i++)
-            learn(input_list, layer_list, 0.01, expected_outputs, W, input_number, i);
-        
+        closedir(d);
+        for(size_t i = 0; i < 20; i++)
+            learn(input_list, layer_list, 0.01, expected_outputs, W, input_number, i); 
         neuron_file = fopen("digits.txt", "w");
         write_neuron(neuron_file, layer_list, W);
     }

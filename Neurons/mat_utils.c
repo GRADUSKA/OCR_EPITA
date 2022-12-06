@@ -1,16 +1,4 @@
-#include <stdio.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <math.h>
-
-/* mat_utils.c */
-
-typedef struct{
-    size_t length;
-    size_t width;
-    double mat[];
-} matrix;
-
+#include "mat_utils.h"
 double mat_get(matrix *w, size_t i, size_t j)
 {
     return w->mat[i * w->width + j];

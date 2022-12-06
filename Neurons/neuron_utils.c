@@ -1,18 +1,5 @@
 #include "mat_utils.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-
-/* neuron_utils.c */
-
-typedef struct{
-    size_t depth;
-    size_t input_size;
-    size_t neuron_size;
-    double* neurons;
-    double* biases;
-} layers;
-
+#include "neuron_utils.h"
 void print_layer(layers *layer)
 {
     printf("\nDepth = %lu\n", layer->depth);

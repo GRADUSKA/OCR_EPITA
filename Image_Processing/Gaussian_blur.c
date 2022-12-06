@@ -1,6 +1,5 @@
-#include <stdio.h>
 #include <math.h>
-#include "use.h"
+#include "Gaussian_blur.h"
 
 double GaussianBlur[] = {1./256., 4./256.,  6./256.,  4./256.,  1./256.,
     4./256., 16./256., 24./256., 16./256., 4./256.,
@@ -8,7 +7,7 @@ double GaussianBlur[] = {1./256., 4./256.,  6./256.,  4./256.,  1./256.,
     4./256., 16./256., 24./256., 16./256., 4./256.,
     1./256., 4./256.,  6./256.,  4./256.,  1./256.};
 
-Uint32* Convolution(SDL_Surface* surface)
+Uint32* Convolution_Gaussian(SDL_Surface* surface)
 {
     Uint32* pixels = surface -> pixels;
     Uint32* result = malloc(surface->h * surface->w * sizeof(Uint32*));
@@ -51,7 +50,7 @@ Uint32* Convolution(SDL_Surface* surface)
 
 void ApplyGaussian(SDL_Surface *surface)
 {
-    Uint32* pixels = Convolution(surface);
+    Uint32* pixels = Convolution_Gaussian(surface);
     int size = surface->w * surface->h;
     Uint32* res = surface->pixels;
     SDL_LockSurface(surface);
@@ -64,23 +63,3 @@ void ApplyGaussian(SDL_Surface *surface)
     free(pixels);
 }
 
-int main(int argc, char** argv)
-{
-    // Checks the number of arguments.
-    if (argc != 2)
-        errx(EXIT_FAILURE, "Usage: image-file");
-
-    SDL_Surface* s = load_image(argv[1]);
-
-    ApplyGaussian(s);
-
-    SDL_SaveBMP(s, "test_gaussian_blur.bmp");
-
-    SDL_FreeSurface(s);
-
-    // Destroys the objects.
-    SDL_Quit();
-
-
-    return EXIT_SUCCESS;
-}

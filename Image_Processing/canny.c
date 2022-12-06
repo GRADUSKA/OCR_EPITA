@@ -1,18 +1,9 @@
-#include <math.h>
-#include "use.h"
-#define highratio 0.4
-#define lowratio 0.33
-int Kx[] = {
-    -1, 0, 1,
-    -2, 0, 2,
-    -1, 0, 1
-};
-
-int Ky[] = {
-    1, 2, 1,
-    0, 0, 0,
-    -1, -2, -1
-};
+#include "canny.h"
+#include <stdio.h>
+#define highratio 0.42
+#define lowratio 0.34
+#define KX (int[]){-1, 0, 1,-2, 0, 2,-1, 0, 1}
+#define KY (int[]){1, 2, 1,0, 0, 0,-1, -2, -1}
 
 int* Convolution(SDL_Surface* surface, int filtre[])
 {
@@ -56,8 +47,8 @@ int* Convolution(SDL_Surface* surface, int filtre[])
 
 double* gradiants(SDL_Surface *surface)
 {
-    int* pixelsX = Convolution(surface, Kx);
-    int* pixelsY = Convolution(surface, Ky);
+    int* pixelsX = Convolution(surface, KX);
+    int* pixelsY = Convolution(surface, KY);
 
     int size = surface->w * surface->h;
 
@@ -236,36 +227,3 @@ void hyperthesis(SDL_Surface* s)
         }
     }
 }
-int main(int argc, char** argv)
-{
-    // Checks the number of arguments.
-    if (argc != 2)
-        errx(EXIT_FAILURE, "Usage: image-file");
-
-    SDL_Surface* s = load_image(argv[1]);
-    int* Gx = Convolution(s,Kx);
-    int* Gy = Convolution(s,Ky);
-    double* theta = direction_grad(Gx, Gy,s->w*s->h);
-    free(Gx);
-    free(Gy);
-    ApplySobel(s);
-    double* nms = non_max_suppr(s,theta);
-    Uint32* pixels = s->pixels;
-    SDL_LockSurface(s);
-    for(int i = 0 ;i < s->w*s->h;i++)
-    {
-        pixels[i]= SDL_MapRGB(s->format, nms[i],nms[i],nms[i]);
-    }
-    SDL_UnlockSurface(s);
-    hyperthesis(s);
-    SDL_SaveBMP(s, "test_canny.bmp");
-    free(nms);
-    free(theta);
-    SDL_FreeSurface(s);
-
-    // Destroys the objects.
-    SDL_Quit(); 
-
-    /*😃 ❤️  😡*/ 
-    return EXIT_SUCCESS;
-} 

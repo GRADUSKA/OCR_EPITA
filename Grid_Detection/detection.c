@@ -93,7 +93,7 @@ void drawHoughSpace(SDL_Surface* s,int* array)
     {
         for(int x_tab = 0; x_tab < w; x_tab++)
         {
-            if((array[y_tab * w + x_tab]) / ((90 * max)/100) != 0)
+            if((array[y_tab * w + x_tab]) / ((93 * max)/100) != 0)
             {
                 double rad = x_tab* M_PI / 180;
                 if((x_tab > 45 && x_tab <= 135) || (x_tab > 225 && x_tab <= 315))

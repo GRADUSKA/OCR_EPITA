@@ -403,10 +403,10 @@ void learn(layers **input_list, layers **layer_list, double learn_rate,
         printf("result = %lu\npercentage = %f\n",
                 max + 1, layer_list[3]->neurons[max]);
 
-        if(iteration % 500 == 0 && expected_outputs[input][max] == 0)
-        {
+        //if(iteration % 500 == 0 && expected_outputs[input][max] == 0)
+        //{
             //shuffle(W, layer_list);
-        }
+        //}
 
         input++;
     }

@@ -79,7 +79,7 @@ void zeroandone(SDL_Surface* surface, layers* layer)
         for(int j = base_x; w < 16; j+=x, w++)
         {
              int n = which(i*width+j, width, width*height, pixels, format, x, y);
-             layer->neurons[h * x + w] = n;
+             layer->neurons[h * 16 + w] = n;
         }
 
     }

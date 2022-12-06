@@ -5,11 +5,11 @@ window
 
 button
 {
-    color : #0a6a70;
-    border-width : 5px;
+    color : #000000;
+    border-width : 7px;
 }
 
 label
 {
-    font-size: 30px;
+    font-size: 40px;
 }

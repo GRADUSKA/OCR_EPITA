@@ -24,7 +24,10 @@ typedef struct UserInterface
     GtkButton* final_step_button;
     GtkButton* quit_button;
     GtkWidget* download_button;
+    GtkButton* solve_button;
     GtkImage* sudoku_image;
+    GtkImage* logo_image;
+    GtkImage* background;
 }UserInterface;
 
 
@@ -219,14 +222,30 @@ void on_state_db(GtkButton *button, gpointer user_data) // download button
     };
 }
 
+static void load_the_css(char* name);
 
-static void load_the_css()
+void begin(GtkButton *button, gpointer user_data)
+{
+
+    All* all = user_data;
+
+    gtk_widget_show(GTK_WIDGET(all->ui.download_button));
+    gtk_widget_show(GTK_WIDGET(all->ui.logo_image));
+    gtk_widget_show(GTK_WIDGET(all->ui.sudoku_image));
+    gtk_widget_hide(GTK_WIDGET(all->ui.solve_button));
+    gtk_widget_hide(GTK_WIDGET(all->ui.background));
+
+    load_the_css("color.css");
+
+}
+
+static void load_the_css(char* name)
 {
     GtkCssProvider *provider;
     GdkDisplay *display;
     GdkScreen *screen;
 
-    GFile *css_file             = g_file_new_for_path("color.css");
+    GFile *css_file             = g_file_new_for_path(name);
     GError *error               = 0;
 
     provider = gtk_css_provider_new();
@@ -252,7 +271,6 @@ void file_selected_changed(GtkFileChooser *chooser, gpointer user_data)
     gtk_image_set_from_pixbuf(all->ui.sudoku_image, pix);
 
     set_hidden4(all);
-
 }
 
 
@@ -260,7 +278,7 @@ int main (int argc, char *argv[])
 {
     gtk_init(NULL, NULL);
 
-    load_the_css();
+    load_the_css("bcolor.css");
 
     // Loads the UI description and builds the UI.
     // (Exits if an error occurs.)
@@ -277,6 +295,7 @@ int main (int argc, char *argv[])
     GtkWindow* window = GTK_WINDOW(gtk_builder_get_object(builder, "window"));
     GtkFixed* fixed = GTK_FIXED(gtk_builder_get_object(builder, "fixed"));
 
+    GtkImage* background = GTK_IMAGE(gtk_builder_get_object(builder, "background"));
     GtkImage* logo_image = GTK_IMAGE(gtk_builder_get_object(builder, "logo_image"));
     GdkPixbuf* pix = gdk_pixbuf_new_from_file("image_test/Melouande.png", NULL);
     pix = gdk_pixbuf_scale_simple(pix, 300, 300, GDK_INTERP_BILINEAR);
@@ -293,6 +312,8 @@ int main (int argc, char *argv[])
 
     GtkButton* quit_button = GTK_BUTTON(gtk_builder_get_object(builder, "quit_button"));
     GtkWidget* download_button = GTK_WIDGET(gtk_builder_get_object(builder, "download_button"));
+
+    GtkButton* solve_button = GTK_BUTTON(gtk_builder_get_object(builder, "solve_button"));
 
 
     //gtk_widget_set_size_request(GTK_WIDGET(window), 1080, 1920);
@@ -315,7 +336,10 @@ int main (int argc, char *argv[])
             .final_step_button = final_step_button,
             .quit_button = quit_button,
             .download_button = download_button,
+            .solve_button = solve_button,
             .sudoku_image = sudoku_image,
+            .logo_image = logo_image,
+            .background = background,
         },
     };
 
@@ -327,6 +351,7 @@ int main (int argc, char *argv[])
     g_signal_connect(previous_step_button, "clicked", G_CALLBACK(on_state_psb), &all);
     g_signal_connect(next_step_button, "clicked", G_CALLBACK(on_state_nsb), &all);
     g_signal_connect(final_step_button, "clicked", G_CALLBACK(on_state_fsb), &all);
+    g_signal_connect(solve_button, "clicked", G_CALLBACK(begin), &all);
     
     g_signal_connect(quit_button, "clicked", gtk_main_quit, &all);
 
@@ -335,6 +360,9 @@ int main (int argc, char *argv[])
     gtk_widget_hide(GTK_WIDGET(previous_step_button));
     gtk_widget_hide(GTK_WIDGET(next_step_button));
     gtk_widget_hide(GTK_WIDGET(final_step_button));
+    gtk_widget_hide(GTK_WIDGET(download_button));
+    gtk_widget_hide(GTK_WIDGET(logo_image));
+    gtk_widget_hide(GTK_WIDGET(sudoku_image));
     
     gtk_main();
     return 0;

@@ -2,7 +2,7 @@
 
 CC = gcc
 CFLAGS = -g -Wall -Wextra -O3 `pkg-config --cflags sdl2 SDL2_image`
-LDLIBS = `pkg-config --libs sdl2 SDL2_image`
+LDLIBS = `pkg-config --libs sdl2 SDL2_image` -lm
 
 all: main
 
@@ -12,10 +12,10 @@ EXE = main
 
 
 main: $(OBJ)
-	$(CC) $(CFLAGS) $^ -o $@  `pkg-config --libs sdl2 SDL2_image` -lm
+	$(CC) $(CFLAGS) $^ -o $@  $(LDLIBS)
 
 %.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@  `pkg-config --libs sdl2 SDL2_image` -lm
+	$(CC) $(CFLAGS) -c $< -o $@  $(LDLIBS)
 
 .PHONY: clean
 

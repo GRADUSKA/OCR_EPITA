@@ -92,7 +92,6 @@ void zeroandone(SDL_Surface* surface, layers* layer)
 // path: Path of the image.
 SDL_Surface* load_image(const char* path)
 {
-    printf("%s", path);
     SDL_Surface* temp = IMG_Load(path);
     if (temp == NULL)
         errx(EXIT_FAILURE, "%s", SDL_GetError());

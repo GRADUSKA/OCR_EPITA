@@ -12,7 +12,7 @@ SRC = boxes.c
 OBJ = ${SRC:.c=.o}
 EXE = ${SRC:.c=}
 
-zeroandone: boxes.o
+boxes: boxes.o
 .PHONY: clean
 
 clean:

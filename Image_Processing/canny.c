@@ -1,7 +1,7 @@
 #include "canny.h"
 #include <stdio.h>
-#define highratio 0.42
-#define lowratio 0.34
+#define highratio 0.4
+#define lowratio 0.32
 #define KX (int[]){-1, 0, 1,-2, 0, 2,-1, 0, 1}
 #define KY (int[]){1, 2, 1,0, 0, 0,-1, -2, -1}
 
@@ -196,9 +196,9 @@ void hyperthesis(SDL_Surface* s)
     char* thresholds = double_threshold(s,lowratio,highratio);
 
     Uint32* pixels = s->pixels;
-    for(int i = 0 ; i < h;i++)
+    for(int i = 1 ; i < h-1;i++)
     {
-        for(int j = 0; j < w; j++)
+        for(int j = 1; j < w-1; j++)
         {
             if(thresholds[i*w+j] == 1)
             {
@@ -206,18 +206,8 @@ void hyperthesis(SDL_Surface* s)
                 {
                     for(int l = 0; l< 3;l++)
                     {
-                        int _i_ = i + k - 1;
-                        int _j_ = j + l - 1;
-                        if(_i_ < 0)
-                            _i_ =0;
-                        if (_i_ >= s->h)
-                            _i_ = s->h-1;
-                        if(_j_ < 0)
-                            _j_ =0;
-                        if (_j_ >= s->w)
-                            _j_ = s->w-1;
-                        if(thresholds[_i_ * l + _j_] == 2)
-                            thresholds[i*w +j] = 2;
+                        if (pixels[(i+k)*w +j +l] == 2)
+                            pixels[i*w+j] = 255;
                     }
                 }
                 if(thresholds[i*w+j] != 2)

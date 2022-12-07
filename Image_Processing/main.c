@@ -26,6 +26,16 @@ int main(int argc, char** argv)
         ApplyGaussian(s);
         SDL_SaveBMP(s,"Gaussian.bmp");
     } 
+    else if(strcmp(a, "--sobel") == 0)
+    {
+        int* Gx = Convolution(s,KX);
+        int* Gy = Convolution(s,KY);
+        free(Gx);
+        free(Gy);
+        ApplySobel(s);
+        SDL_SaveBMP(s,"Sobel.bmp");
+
+    }
     else if (strcmp(a, "--canny") == 0) 
     {
         int* Gx = Convolution(s,KX);

@@ -29,8 +29,8 @@ void exit_help_2()
 
 void read_neuron(FILE *file, layers **layer_list, matrix **W)
 {
-    size_t div = 1;
-    double value = 0;
+    double div = 10000.;
+    double value = 0.;
     char c = fgetc(file);
     size_t j = 0;
     for(size_t num = 0; c != '\0' && num < 3; num++)
@@ -38,21 +38,26 @@ void read_neuron(FILE *file, layers **layer_list, matrix **W)
         j = 0;
         while(c != '\0' && c != '\n' && j < W[num]->width * W[num]->length)
         {
-            div = 1;
+            int neg = 0;
+            value = 0.;
+            if(c == '-')
+            {
+                neg = 1;
+                c = fgetc(file);
+            }
             while(c != ' ' && c != '\n' && c != '\0')
             {
-                value = 10 * value + c - '0';
+                value *= 10;
+                value += (double)((double)c - '0');
                 c = fgetc(file);
             }
             if(c == ' ')
             {
                 c = fgetc(file);
             }
-            W[num]->mat[j] = value / div;
+            W[num]->mat[j] = neg ? -value / div : value/div;
             j++;
         }
-        if(value != 0 && j < W[num]->width * W[num]->length)
-            W[num]->mat[j] = value / div;
         if(c == '\n')
         {
             c = fgetc(file);
@@ -68,28 +73,31 @@ void read_neuron(FILE *file, layers **layer_list, matrix **W)
         j = 0;
         while(c != '\0' && c != '\n' && j < layer_list[num]->neuron_size)
         {
-            div = 1;
+            int neg = 0;
+            value = 0.;
+            if(c == '-')
+            {
+                neg = 1;
+                c = fgetc(file);
+            }
             while(c != ' ' && c != '\n' && c != '\0')
             {
-                value = 10 * value + c - '0';
+                value *= 10;
+                value += (double) ((double)c - '0');
                 c = fgetc(file);
             }
             if(c == ' ')
             {
                 c = fgetc(file);
             }
-            layer_list[num]->biases[j] = value / div;
+            layer_list[num]->biases[j] = neg ? -value / div : value / div;
             j++;
         }
-        if(value != 0 && j < layer_list[num]->neuron_size)
-            layer_list[num]->biases[j] = value / div;
         if(c == '\n')
         {
             c = fgetc(file);
         }
     }
-    if(j < layer_list[num]->neuron_size && num < 4)
-        layer_list[num]->biases[j] = value / div;
 }
 
 void write_neuron(FILE *file, layers **layer_list, matrix **W)
@@ -100,20 +108,22 @@ void write_neuron(FILE *file, layers **layer_list, matrix **W)
         for(size_t i = 0; i < W[num]->width * W[num]->length; i++)
         {
             double value = W[num]->mat[i];
-            if(value == 0.)
+            if(value < 0)
             {
-                fputc('0', p);
+                value *= -1;
+                fputc('-', p);
             }
-            else
+            size_t j = 0;
+            while(((int)value / 10))
             {
-                size_t j = 0;
-                while(j < 6)
-                {
-                    fputc(((int) value) % 10 + '0', p);
-                    value *= 10;
-                    fputc(((int) value) % 10 + '0', p);
-                    j++;
-                }
+                value /= 10;
+                j--;
+            }
+            while(j < 6)
+            {
+                fputc((((int) value) % 10) + '0', p);
+                value *= 10;
+                j++;
             }
             fputc(' ', p);
         }
@@ -124,20 +134,22 @@ void write_neuron(FILE *file, layers **layer_list, matrix **W)
         for(size_t i = 0; i < layer_list[num]->neuron_size; i++)
         {
             double value = layer_list[num]->biases[i];
-            if(value == 0.)
+            if(value < 0)
             {
-                fputc('0', p);
+                value *= -1;
+                fputc('-', p);
             }
-            else
+            size_t j = 0;
+            while(((int)value / 10))
             {
-                size_t j = 0;
-                while(j < 6)
-                {
-                    fputc(((int) value) % 10 + '0', p);
-                    value *= 10;
-                    fputc(((int) value) % 10 + '0', p);
-                    j++;
-                }
+                value /= 10;
+                j--;
+            }
+            while(j < 6)
+            {
+                fputc((((int) value) % 10) + '0', p);
+                value *= 10;
+                j++;
             }
             fputc(' ', p);
         }
@@ -181,12 +193,12 @@ int main(int argc, char** argv)
         for(size_t i = 1; i < sizes[3]; i++)
             if(layer_list[3]->neurons[i] > layer_list[3]->neurons[max])
                 max = i;
-        printf("Result: %lu\nPercentage: %f", max + 1, layer_list[3]->neurons[max]);
+        printf("Result: %lu\nPercentage: %f\n", max + 1, layer_list[3]->neurons[max]);
     }
     else
     {
         size_t input_number = 0;
-        const char *d_name = "testing_data/";
+        const char *d_name = "training_data/";
         struct dirent* file; 
         DIR* dir;
         char dir_name[PATH_MAX + 1];
@@ -202,7 +214,7 @@ int main(int argc, char** argv)
         closedir(dir);
 
         
-        for(size_t i = 0; i < 200000; i++)
+        for(size_t i = 0; i < 3001; i++)
         {
             size_t num = rand() % 9;
             double *expected_outputs = calloc(9, sizeof(double));
@@ -223,9 +235,22 @@ int main(int argc, char** argv)
             strcat(file_name, file->d_name);
             transform(file_name, layer_list[0]);
             closedir(dir);
-            printf("\n");
-            printf("input: %lu\n", num + 1);
-            learn(layer_list, W, expected_outputs, 0.01);
+            learn(layer_list, W, expected_outputs, 0.5);
+
+            if(!(i % 500))
+            {
+                printf("\n");
+                printf("Input: %lu\n", num + 1);
+                size_t max = 0;
+                for(size_t i = 1; i < 9; i++)
+                {
+                    if(layer_list[3]->neurons[i] > layer_list[3]->neurons[max])
+                        max = i;
+                }
+                printf("Result = %lu\nPercentage = %f\n",
+                    max + 1, layer_list[3]->neurons[max]);
+            }
+
             free(expected_outputs);
         }
 

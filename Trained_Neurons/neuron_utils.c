@@ -104,7 +104,7 @@ void init_weight(double *w, size_t in, size_t out)
         for(size_t width = 0; width < in; width++)
         {
             w[length * in + width] =
-                0.06 * ((double)rand() / (double)RAND_MAX - 0.5f);
+                2. * ((double)rand() / (double)RAND_MAX - 0.5f);
         }
     }
 }
@@ -385,12 +385,4 @@ void learn(layers **layer_list, matrix **W,
         }
 
         update_all_gradients(layer_list, W, expected_outputs, learn_rate);
-        size_t max = 0;
-        for(size_t i = 1; i < 9; i++)
-        {
-            if(layer_list[3]->neurons[i] > layer_list[3]->neurons[max])
-                max = i;
-        }
-        printf("result = %lu\npercentage = %f\n",
-                max + 1, layer_list[3]->neurons[max]);
-}
+} 

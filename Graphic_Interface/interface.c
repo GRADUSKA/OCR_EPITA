@@ -72,9 +72,18 @@ void set_shown4(All *all) //download button will be shown + other button will di
 
 void sizing_image(GdkPixbuf* pixbuf, GtkImage* image, int size)
 {
+    int h = gdk_pixbuf_get_height(pixbuf);
+    int w = gdk_pixbuf_get_width(pixbuf);
+    int new_w = size;
+    int new_h = size;
 
-
-    pixbuf = gdk_pixbuf_scale_simple(pixbuf, size, size, GDK_INTERP_BILINEAR);
+    new_w = (w * 800) / h;
+    if(new_w > 1000)
+    {
+        new_h = (new_h * 1000)/new_w;
+        new_w = 1000;
+    }
+    pixbuf = gdk_pixbuf_scale_simple(pixbuf, new_w, new_h, GDK_INTERP_BILINEAR);
     gtk_image_set_from_pixbuf(image, pixbuf);
 }
 
@@ -89,7 +98,7 @@ void set_save3(All* all) // the final step button becomes the save button and ne
     sizing_image(pixbuf, all->ui.sudoku_image, 800);
 
     gtk_button_set_label(all->ui.final_step_button, "Save");
-    
+
     gtk_widget_hide(GTK_WIDGET(all->ui.next_step_button));
 }
 
@@ -259,9 +268,7 @@ void file_selected_changed(GtkFileChooser *chooser, gpointer user_data)
     if(!all->sudoku_file) return;
 
     GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file(all->sudoku_file, NULL);
-    GdkPixbuf* pix = gdk_pixbuf_scale_simple(pixbuf, 800, 800, GDK_INTERP_BILINEAR);
-    gtk_image_set_from_pixbuf(all->ui.sudoku_image, pix);
-
+    sizing_image(pixbuf, all->ui.sudoku_image, 800);
     set_hidden4(all);
 }
 
@@ -297,11 +304,12 @@ int main (int argc, char *argv[])
     GdkPixbuf* pixbuf2 = gdk_pixbuf_new_from_file("image_test/background.png", NULL);
     pixbuf2 = gdk_pixbuf_scale_simple(pixbuf2, 1920, 1080, GDK_INTERP_BILINEAR);
     gtk_image_set_from_pixbuf(background, pixbuf2);
-    
+
     GtkImage* logo_image = GTK_IMAGE(gtk_builder_get_object(builder, "logo_image"));
     GdkPixbuf* pix = gdk_pixbuf_new_from_file("image_test/Melouande.png", NULL);
-    sizing_image(pix, logo_image, 300);
-    
+    pix = gdk_pixbuf_scale_simple(pix, 300, 300, GDK_INTERP_BILINEAR);
+    gtk_image_set_from_pixbuf(logo_image, pix);
+
     GtkImage* sudoku_image = GTK_IMAGE(gtk_builder_get_object(builder, "sudoku_image"));
     GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file("image_test/Melouande.png", NULL);
     sizing_image(pixbuf, sudoku_image, 800);
@@ -327,7 +335,7 @@ int main (int argc, char *argv[])
 
         .sudoku_file = "solved.png",
 
-        .ui = 
+        .ui =
         {
             .window = window,
             .fixed = fixed,
@@ -344,16 +352,16 @@ int main (int argc, char *argv[])
         },
     };
 
-   
+
     // Connects signal handlers.
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     g_signal_connect(download_button, "selection-changed", G_CALLBACK (file_selected_changed), &all);
-    
+
     g_signal_connect(previous_step_button, "clicked", G_CALLBACK(on_state_psb), &all);
     g_signal_connect(next_step_button, "clicked", G_CALLBACK(on_state_nsb), &all);
     g_signal_connect(final_step_button, "clicked", G_CALLBACK(on_state_fsb), &all);
     g_signal_connect(solve_button, "clicked", G_CALLBACK(begin), &all);
-    
+
     g_signal_connect(quit_button, "clicked", gtk_main_quit, &all);
 
     gtk_widget_show_all(GTK_WIDGET(window));
@@ -366,7 +374,7 @@ int main (int argc, char *argv[])
     gtk_widget_hide(GTK_WIDGET(sudoku_image));
     gtk_widget_hide(GTK_WIDGET(title));
 
-    
+
     gtk_main();
     return 0;
-}   
+}

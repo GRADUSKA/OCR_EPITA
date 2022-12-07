@@ -1,5 +1,5 @@
 #include "use.h"
-
+#include "blob.h"
 Blob* init_blob(int x,int y)
 {
     Blob* blob = malloc(sizeof(Blob));
@@ -232,7 +232,7 @@ struct Blob_list* generateBlob(SDL_Surface* s)
     return bloblist;
 }
 
-void show_blobs(SDL_Surface* s, Blob_list* bloblist, const char* output_image)
+void show_blobs(SDL_Surface* s, Blob_list* bloblist)
 {
     SDL_LockSurface(s);
     for (int i = 0; i < bloblist->nb_blob; ++i)
@@ -247,7 +247,7 @@ void show_blobs(SDL_Surface* s, Blob_list* bloblist, const char* output_image)
         SDL_FillRect(s,rect,color);
     }
     SDL_UnlockSurface(s);
-    save_image(s,output_image);
+    SDL_SaveBMP(s,"test_show_blob.bmp");
 }
 
 SDL_Surface* crop(SDL_Surface* s, Blob* blob)
@@ -277,15 +277,14 @@ SDL_Surface* crop(SDL_Surface* s, Blob* blob)
 
 }
 
-void apply_blob_crop(const char* input_image, const char* output_image)
+void apply_blob_crop(SDL_Surface* s)
 {
-    SDL_Surface* s = load_image(input_image);
     Blob_list* bloblist = generateBlob(s);
     //show_blobs(s,bloblist,"result_image/blobs.bmp");
     Blob* final_blob = merge_blobs(bloblist);
     SDL_Surface* cropped = crop(s,final_blob);
     SDL_FreeSurface(s);
-    save_image(cropped,output_image);
+    SDL_SaveBMP(cropped,"test_blob.bmp");
     SDL_FreeSurface(cropped);
 }
 

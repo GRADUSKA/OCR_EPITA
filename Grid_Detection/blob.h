@@ -6,14 +6,20 @@
 #include <stdio.h>
 
 
-Blob*
-{
-    int xmax;
+typedef struct Blob
+{   int xmax;
     int ymax;
     int xmin;
     int ymin;
     int* list;
-}
+} Blob; 
+
+typedef struct Blob_list
+{
+    Blob* list;
+    size_t size;
+    int nb_blob;
+} Blob_list;
 
 struct Blob* init_blob(int x,int y);
 void free_Blob_list(struct Blob_list* b);
@@ -31,8 +37,8 @@ int blob_size(struct Blob *blob);
 int inter(int max1, int min1, int max2, int min2, int t);
 struct Blob* merge_blobs(struct Blob_list* blobs);
 struct Blob_list* generateBlob(SDL_Surface* s);
-void show_blobs(SDL_Surface* s, Blob_list* bloblist, const char* output_image);
+void show_blobs(SDL_Surface* s, Blob_list* bloblist);
 SDL_Surface* crop(SDL_Surface* s, Blob* blob);
-void apply_blob_crop(const char* input_image, const char* output_image);
+void apply_blob_crop(SDL_Surface* s);
 
 #endif

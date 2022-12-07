@@ -1,5 +1,7 @@
 #include "use.h"
+#include "blob.h"
 #include <stdio.h>
+#include <string.h>
 #include <math.h>
 
 //Deux problemes possibles :
@@ -88,7 +90,7 @@ void drawHoughSpace(SDL_Surface* s,int* array)
         if (max < array[i])
             max = array[i];
     }
- 
+
     for(int y_tab = 0; y_tab < h; y_tab++)
     {
         for(int x_tab = 0; x_tab < w; x_tab++)
@@ -123,17 +125,31 @@ void drawHoughSpace(SDL_Surface* s,int* array)
 int main(int argc, char** argv)
 {
     // Checks the number of arguments.
-    if (argc != 2)
+    if (argc != 3)
         errx(EXIT_FAILURE, "Usage: image-file");
     SDL_Surface* s = load_image(argv[1]);
 
-    //Call the hough function
-    int* tab = hough_function(s);
-    drawHoughSpace(s,tab);
-    SDL_SaveBMP(s,"merde.bmp");
+    if(s == NULL)
+        errx(EXIT_FAILURE,"NOT A GOOD IMAGE");
+    char* a = argv[2];
+    if(strcmp(a,"--hough") == 0)
+    {
+        int* tab = hough_function(s);
+        drawHoughSpace(s,tab);
+        SDL_SaveBMP(s,"merde.bmp");
+    }
+    else if (strcmp(a,"--blob")==0)
+    {
+        printf("a mimir\n");
+        apply_blob_crop(s);
+        printf("heu bahe jsp\n");
+    }
+    else
+    {
+        errx(EXIT_FAILURE,"NOT A GOOD ARGUMENT");
+    }
 
     // Destroys the objects.
-    SDL_FreeSurface(s);
     SDL_Quit();
 
 

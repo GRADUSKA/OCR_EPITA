@@ -2,11 +2,11 @@
 
 CC = gcc
 CPPFLAGS =
-CFLAGS = -g -Wall -Wextra -O3 `pkg-config --cflags sdl2 SDL2_image` -lm
-LDFLAGS =
+CFLAGS = -g -Wall -Wextra `pkg-config --cflags sdl2 SDL2_image` -lm
+LDFLAGS = -g
 LDLIBS = `pkg-config --libs sdl2 SDL2_image` -lm
 
-all: detection blob
+all: detection
 
 SRC =  detection.c use.c blob.c
 OBJ = ${SRC:.c=.o}

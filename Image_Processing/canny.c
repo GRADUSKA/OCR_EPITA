@@ -113,9 +113,9 @@ double* non_max_suppr(SDL_Surface *surface, double* theta)
             theta[i]+=180;
     }
 
-    for(int i = 0; i < surface->h; i++)
+    for(int i = 1; i < surface->h-1; i++)
     {
-        for(int j = 0;j < surface->w;j++)
+        for(int j = 1;j < surface->w-1;j++)
         {
             int q = 255;
             int r = 255;

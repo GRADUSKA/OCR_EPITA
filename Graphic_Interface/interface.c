@@ -1,5 +1,10 @@
 #include <gtk/gtk.h>
 
+typedef enum Save
+{
+    T,
+    F,
+}Save;
 
 typedef enum StateButton
 {
@@ -40,6 +45,7 @@ typedef struct All
     StateButton state4; //download
     gchar* sudoku_file;
     UserInterface ui;
+    Save is_save;
 }All;
 
 
@@ -94,7 +100,7 @@ void set_save3(All* all) // the final step button becomes the save button and ne
     all->state2 = SAVE;
     all->state3 = SAVE;
 
-    GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file("image_test/solved.png", NULL);
+    GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file("images/solved.png", NULL);
     sizing_image(pixbuf, all->ui.sudoku_image, 800);
 
     gtk_button_set_label(all->ui.final_step_button, "Save");
@@ -106,7 +112,11 @@ void set_save3(All* all) // the final step button becomes the save button and ne
 void set_back3(All* all)
 {
     //funtion to save the the sudoku solved file
-    //TODO
+    all->is_save = T;
+    remove("images/test_grayscale.bmp");
+    remove("images/rotation.jpg");
+    remove("images/test_gaussian_blur.bmp");
+    remove("images/test_canny.bmp");
     set_shown4(all);
 }
 
@@ -126,7 +136,7 @@ void set_grayscale(All* all)
     all->state1 = GRAYSCALE;
     all->state2 = GRAYSCALE;
 
-    GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file("image_test/test_grayscale.bmp", NULL);
+    GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file("images/test_grayscale.bmp", NULL);
     sizing_image(pixbuf, all->ui.sudoku_image, 800);
 }
 
@@ -136,7 +146,7 @@ void set_rotation(All* all)
     all->state1 = ROTATION;
     all->state2 = ROTATION;
 
-    GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file("image_test/rotation.jpg", NULL);
+    GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file("images/rotation.jpg", NULL);
     sizing_image(pixbuf, all->ui.sudoku_image, 800);
 }
 
@@ -146,7 +156,7 @@ void set_gaussian_blur(All* all)
     all->state1 = GAUSSIAN_BLUR;
     all->state2 = GAUSSIAN_BLUR;
 
-    GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file("image_test/test_gaussian_blur.bmp", NULL);
+    GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file("images/test_gaussian_blur.bmp", NULL);
     sizing_image(pixbuf, all->ui.sudoku_image, 800);
 }
 
@@ -159,7 +169,7 @@ void set_canny(All* all)
     gtk_widget_show(GTK_WIDGET(all->ui.next_step_button));
     gtk_button_set_label(all->ui.final_step_button, "Final step");
 
-    GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file("image_test/test_canny.bmp", NULL);
+    GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file("images/test_canny.bmp", NULL);
     sizing_image(pixbuf, all->ui.sudoku_image, 800);
 }
 
@@ -272,6 +282,16 @@ void file_selected_changed(GtkFileChooser *chooser, gpointer user_data)
     set_hidden4(all);
 }
 
+void quit(GtkButton *button, gpointer user_data)
+{
+    All *all = user_data;
+
+    if(all->is_save == F)
+    {
+        remove("images/solved.png");
+    }
+    gtk_main_quit();
+}
 
 int main (int argc, char *argv[])
 {
@@ -295,23 +315,23 @@ int main (int argc, char *argv[])
     GtkFixed* fixed = GTK_FIXED(gtk_builder_get_object(builder, "fixed"));
 
     GtkImage* title = GTK_IMAGE(gtk_builder_get_object(builder, "title"));
-    GdkPixbuf* pix2 = gdk_pixbuf_new_from_file("image_test/title.png", NULL);
+    GdkPixbuf* pix2 = gdk_pixbuf_new_from_file("images/title.png", NULL);
     pix2 = gdk_pixbuf_scale_simple(pix2, 700, 130, GDK_INTERP_BILINEAR);
     gtk_image_set_from_pixbuf(title, pix2);
 
 
     GtkImage* background = GTK_IMAGE(gtk_builder_get_object(builder, "background"));
-    GdkPixbuf* pixbuf2 = gdk_pixbuf_new_from_file("image_test/background.png", NULL);
+    GdkPixbuf* pixbuf2 = gdk_pixbuf_new_from_file("images/background.png", NULL);
     pixbuf2 = gdk_pixbuf_scale_simple(pixbuf2, 1920, 1080, GDK_INTERP_BILINEAR);
     gtk_image_set_from_pixbuf(background, pixbuf2);
 
     GtkImage* logo_image = GTK_IMAGE(gtk_builder_get_object(builder, "logo_image"));
-    GdkPixbuf* pix = gdk_pixbuf_new_from_file("image_test/Melouande.png", NULL);
+    GdkPixbuf* pix = gdk_pixbuf_new_from_file("images/Melouande.png", NULL);
     pix = gdk_pixbuf_scale_simple(pix, 300, 300, GDK_INTERP_BILINEAR);
     gtk_image_set_from_pixbuf(logo_image, pix);
 
     GtkImage* sudoku_image = GTK_IMAGE(gtk_builder_get_object(builder, "sudoku_image"));
-    GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file("image_test/Melouande.png", NULL);
+    GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file("images/Melouande.png", NULL);
     sizing_image(pixbuf, sudoku_image, 800);
 
     GtkButton* previous_step_button = GTK_BUTTON(gtk_builder_get_object(builder, "previous_step_button"));
@@ -333,7 +353,7 @@ int main (int argc, char *argv[])
         .state3 = HIDDEN, //final
         .state4 = SHOWN, //download
 
-        .sudoku_file = "solved.png",
+        .sudoku_file = "images/solved.png",
 
         .ui =
         {
@@ -350,6 +370,7 @@ int main (int argc, char *argv[])
             .background = background,
             .title = title,
         },
+        .is_save = F,
     };
 
 
@@ -362,7 +383,8 @@ int main (int argc, char *argv[])
     g_signal_connect(final_step_button, "clicked", G_CALLBACK(on_state_fsb), &all);
     g_signal_connect(solve_button, "clicked", G_CALLBACK(begin), &all);
 
-    g_signal_connect(quit_button, "clicked", gtk_main_quit, &all);
+    g_signal_connect(quit_button, "clicked", G_CALLBACK(quit), &all);
+    //g_signal_connect(quit_button, "clicked", gtk_main_quit, &all);
 
     gtk_widget_show_all(GTK_WIDGET(window));
 

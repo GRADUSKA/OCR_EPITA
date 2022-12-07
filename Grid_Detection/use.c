@@ -39,7 +39,7 @@ void save_image(char* s, SDL_Renderer* renderer, SDL_Window* win)
     }
 }
 
-void SaveScreenshot(SDL_Renderer *renderer)
+/*void SaveScreenshot(SDL_Renderer *renderer)
 {
     int w = 1920;
     int h = 1080;
@@ -47,4 +47,4 @@ void SaveScreenshot(SDL_Renderer *renderer)
     SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_ARGB8888, sshot->pixels, sshot->pitch);
     SDL_SaveBMP(sshot, "screenshot.bmp");
     SDL_FreeSurface(sshot);
-}
+}*/

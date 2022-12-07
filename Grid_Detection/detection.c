@@ -1,8 +1,50 @@
 #include "use.h"
+#include "../Image_Processing/rotation.h"
 #include "blob.h"
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+typedef struct vector
+{
+    size_t capacity;
+    size_t size;
+    int *data;
+}vector;
+
+struct vector *vector_new()
+{
+    struct vector *viktor = malloc(sizeof(struct vector));
+    if(!viktor)
+        errx(1,"Not enough memory!");
+    viktor->capacity = 1;
+    viktor->size = 0;
+    viktor->data = malloc(sizeof(int));
+    if(!viktor->data)
+        errx(1,"Not enough memory!");
+    return viktor;
+}
+
+void vector_free(struct vector *v)
+{
+    free(v->data);
+    free(v);
+}
+
+void double_capacity(struct vector *v)
+{
+    v->capacity *= 2;
+    v->data = realloc(v->data, v->capacity * sizeof(int));
+    if(!v->data)
+        errx(1,"Not enough memory!");
+}
+
+void vector_push(struct vector *v, int x)
+{
+    if(v->size+1 > v->capacity)
+        double_capacity(v);
+    v->data[v->size] = x;
+    v->size++;
+}
 
 //Deux problemes possibles :
 //1 : je remplis mal mon array
@@ -122,6 +164,51 @@ void drawHoughSpace(SDL_Surface* s,int* array)
 }
 
 
+double get_angles(SDL_Surface* s,int* array)
+{
+    int w_s = s->w;
+    int h_s = s->h;
+    int w = 360;
+    int h = sqrt((w_s * w_s) + (h_s * h_s))*2;
+
+    vector *anglesX = vector_new(); 
+    vector *anglesY = vector_new();
+
+    int max = array[0];
+    for(int i = 0; i < (w*h);i++)
+    {
+        if (max < array[i])
+            max = array[i];
+    }
+
+    for(int y_tab = 0; y_tab < h; y_tab++)
+    {
+        for(int x_tab = 0; x_tab < w; x_tab++)
+        {
+            if((array[y_tab * w + x_tab]) / ((80 * max)/100) != 0)
+            {
+                if((x_tab > 45 && x_tab <= 135) || (x_tab > 225 && x_tab <= 315))
+                    vector_push(anglesX,x_tab);
+                else
+                    vector_push(anglesY,x_tab);                   
+            }
+        }
+    }
+
+    int res = 0;
+    if(anglesX->size > anglesY->size)
+    {
+        for(size_t i = 0; i < anglesX->size;i++)
+            res += anglesX->data[i];
+        return res/anglesX->size;
+    }
+    else    
+    {
+        for(size_t i = 0; i < anglesY->size;i++)
+            res += anglesY->data[i];
+        return res/anglesY->size;
+    }
+}
 int main(int argc, char** argv)
 {
     // Checks the number of arguments.
@@ -137,6 +224,11 @@ int main(int argc, char** argv)
         int* tab = hough_function(s);
         drawHoughSpace(s,tab);
         SDL_SaveBMP(s,"merde.bmp");
+        double angle = get_angles(s,tab);
+        if(angle > 0)
+        {
+            Rotation_shearing(s,angle);
+        }
     }
     else if (strcmp(a,"--blob")==0)
     {

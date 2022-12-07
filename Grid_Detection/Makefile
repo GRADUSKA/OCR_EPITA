@@ -6,13 +6,13 @@ CFLAGS = -g -Wall -Wextra -O3 `pkg-config --cflags sdl2 SDL2_image` -lm
 LDFLAGS =
 LDLIBS = `pkg-config --libs sdl2 SDL2_image` -lm
 
-all: detection
+all: detection blob
 
-SRC =  detection.c use.c
+SRC =  detection.c use.c blob.c
 OBJ = ${SRC:.c=.o}
 EXE = ${SRC:.c=}
 
-detection: detection.o use.o
+detection: detection.o use.o blob.c
 .PHONY: clean
 
 clean:

@@ -375,25 +375,16 @@ void shuffle(matrix **W, layers **layer_list)
     }
 }
 
-void learn(layers **input_list, layers **layer_list, double learn_rate,
-        double **expected_outputs, matrix **W, size_t input_number, size_t iteration)
+void learn(layers **layer_list, matrix **W,
+        double *expected_outputs, double learn_rate)
 {
-    size_t input = 0;
-    while(input < input_number)
-    {
-        size_t num = rand() % input_number;
-        size_t number = num % 9;
         for(size_t i = 1; i < 4; i++)
         {
             for(size_t neuron = 0; neuron < layer_list[i]->neuron_size; neuron++)
                 layer_list[i]->neurons[neuron] = 0;
         }
 
-        printf("\n");
-        layer_list[0]->neurons = input_list[num]->neurons;
-        printf("input = %lu\n",number + 1);
-        update_all_gradients(layer_list, W, expected_outputs[num],
-                learn_rate);
+        update_all_gradients(layer_list, W, expected_outputs, learn_rate);
         size_t max = 0;
         for(size_t i = 1; i < 9; i++)
         {
@@ -402,12 +393,4 @@ void learn(layers **input_list, layers **layer_list, double learn_rate,
         }
         printf("result = %lu\npercentage = %f\n",
                 max + 1, layer_list[3]->neurons[max]);
-
-        //if(iteration % 500 == 0 && expected_outputs[input][max] == 0)
-        //{
-            //shuffle(W, layer_list);
-        //}
-
-        input++;
-    }
 }

@@ -82,15 +82,22 @@ void zeroandone(SDL_Surface* surface)
         size_t w = 0;
         for(int j = base_x; w < 16; j+=x, w++)
         {
-             int n = which(i*width+j, width, width*height, pixels, format, x, y);
-             if(n == 1)
-             {
-                 fputc('1', file);
-             }
-             else
+             if(j < 0 || i < 0 || j > surface->w || i > surface->h)
              {
                  fputc('0', file);
              }
+             else
+             { 
+                 int n = which(i*width+j, width, width*height, pixels, format, x, y);
+                 if(n == 1)
+                 {
+                    fputc('1', file);
+                 }
+                 else
+                 {
+                    fputc('0', file);        
+                 }
+            }
         }
         fputc('\n', file);
 

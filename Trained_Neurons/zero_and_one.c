@@ -78,8 +78,8 @@ void zeroandone(SDL_Surface* surface, layers* layer)
         size_t w = 0;
         for(int j = base_x; w < 16; j+=x, w++)
         {
-             int n = which(i*width+j, width, width*height, pixels, format, x, y);
-             layer->neurons[h * 16 + w] = n;
+            int n = which(i*width+j, width, width*height, pixels, format, x, y);
+            layer->neurons[h * 16 + w] = n;
         }
 
     }
@@ -92,6 +92,7 @@ void zeroandone(SDL_Surface* surface, layers* layer)
 // path: Path of the image.
 SDL_Surface* load_image(const char* path)
 {
+    printf("%s", path);
     SDL_Surface* temp = IMG_Load(path);
     if (temp == NULL)
         errx(EXIT_FAILURE, "%s", SDL_GetError());

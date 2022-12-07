@@ -14,7 +14,7 @@
 void exit_help()
 {
     char* help =
-        "Usage:\nvalid_data_path\nlearn";
+        "Usage:\n./main valid_data_path\n./main learn";
 
     errx(EXIT_FAILURE, "%s", help);
 }
@@ -23,14 +23,6 @@ void exit_help_2()
 {
     char* help =
         "Must train before";
-
-    errx(EXIT_FAILURE, "%s", help);
-}
-
-void exit_help_3()
-{
-    char* help =
-        "No training data";
 
     errx(EXIT_FAILURE, "%s", help);
 }
@@ -194,64 +186,49 @@ int main(int argc, char** argv)
     else
     {
         size_t input_number = 0;
-        DIR* d;
         const char *d_name = "testing_data/";
-        d = opendir(d_name);
-        if(!d)
-            exit_help_3();
-        struct dirent* dir;
-        struct dirent* file;
-        dir = readdir(d);
-        if(dir->d_type)
+        struct dirent* file; 
+        DIR* dir;
+        char dir_name[PATH_MAX + 1];
+        strcpy(dir_name, d_name);
+        char ki[3] = {1 + '0', '/', '\0'};
+        strcat(dir_name, ki);
+        dir = opendir(dir_name);
+        while((file = readdir(dir)))
         {
-            DIR* di;
-            char dir_name[PATH_MAX + 1];
-            strcpy(dir_name, d_name);
-            strcat(dir_name, dir->d_name);
-            strcat(dir_name, "/");
-            di = opendir(dir_name);
-            while((file = readdir(di)))
+            if(file->d_name[0] != '.')
                 input_number++;
-            closedir(di);
         }
-        closedir(d);
-        input_number *= 9;
-        layers **input_list = malloc(sizeof(layers*) * input_number);
-        double **expected_outputs = malloc(sizeof(double*) * input_number);
-        for(size_t i = 0; i < input_number; i++)
-        {
-            input_list[i] = malloc(sizeof(layers*));
-            input_list[i]->neurons = malloc(sizeof(double) * sizes[0]);
-            input_list[i]->neuron_size = sizes[0];
-            expected_outputs[i] = calloc(9, sizeof(double));
-            expected_outputs[i][i % 9] = 1;
-        }
+        closedir(dir);
 
-        for(size_t num = 0; num < 9; num++)
+        
+        for(size_t i = 0; i < 200000; i++)
         {
-            DIR* di;
-            char dir_name[PATH_MAX + 1];
+            size_t num = rand() % 9;
+            double *expected_outputs = calloc(9, sizeof(double));
+            expected_outputs[num] = 1;
             strcpy(dir_name, d_name);
             char k[3] = {num + 1 + '0', '/', '\0'};
             strcat(dir_name, k);
-            di = opendir(dir_name);
-            if(dir->d_type)
+            dir = opendir(dir_name);
+            size_t image = rand() % input_number;
+            while(image < input_number)
             {
-                size_t i = 0;
-                while((file = readdir(di)))
-                {
-                    char file_name[PATH_MAX + 1];
-                    strcpy(file_name, dir_name);
-                    strcat(file_name, file->d_name);
-                    transform(file_name, input_list[i * 9 + num]);
-                    i++;
-                }
+                file = readdir(dir);
+                if(file->d_name[0] != '.')
+                    image++;
+            }
+            char file_name[PATH_MAX + 1];
+            strcpy(file_name, dir_name);
+            strcat(file_name, file->d_name);
+            transform(file_name, layer_list[0]);
+            closedir(dir);
+            printf("\n");
+            printf("input: %lu\n", num + 1);
+            learn(layer_list, W, expected_outputs, 0.01);
+            free(expected_outputs);
         }
-            closedir(di);
-        }
-        closedir(d);
-        for(size_t i = 0; i < 20; i++)
-            learn(input_list, layer_list, 0.01, expected_outputs, W, input_number, i); 
+
         neuron_file = fopen("digits.txt", "w");
         write_neuron(neuron_file, layer_list, W);
     }

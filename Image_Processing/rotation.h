@@ -1,4 +1,4 @@
 #include "use.h"
 #pragma once
-SDL_Surface* SDL_RotationCentral(SDL_Surface* origine, float angle);
+SDL_Surface* Rotation_shearing(SDL_Surface* image, double angle);
 float get_angle(char* s);

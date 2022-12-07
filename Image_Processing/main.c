@@ -83,7 +83,7 @@ int main(int argc, char** argv)
             errx(EXIT_FAILURE,"Put an angle");
 
         float a = get_angle(argv[3]);
-        SDL_Surface* res = SDL_RotationCentral(s,a);    
+        SDL_Surface* res = Rotation_shearing(s,a);    
         SDL_SaveBMP(res,"Rotation.bmp");
     }
 

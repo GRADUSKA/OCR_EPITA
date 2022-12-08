@@ -1,6 +1,8 @@
 #include <gtk/gtk.h>
 
 #include "../Image_Processing/image_process.h"
+#include "../Grid_Detection/detection.h"
+#include "../Result_grid/result_grid.h"
 
 typedef enum Save
 {
@@ -13,10 +15,11 @@ typedef enum StateButton
     SHOWN,
     HIDDEN,
     SUDOKU,
-    ROTATION,
     GRAYSCALE,
     GAUSSIAN_BLUR,
     CANNY,
+    HOUGH,
+    ROTATION,
     SOLVED,
     SAVE,
 }StateButton;
@@ -162,6 +165,15 @@ void set_gaussian_blur(All* all)
     sizing_image(pixbuf, all->ui.sudoku_image, 800);
 }
 
+void set_hough(All* all)
+{
+    all->state1 = HOUGH;
+    all->state2 = HOUGH;
+
+    GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file("Hough.bmp", NULL);
+    sizing_image(pixbuf, all->ui.sudoku_image, 800);
+}
+
 
 void set_canny(All* all)
 {
@@ -183,11 +195,12 @@ void on_state_psb(GtkButton *button, gpointer user_data) //previous step button
     switch(all->state1) // previous
     {
         case SUDOKU: set_shown4(all); break;
-        case ROTATION: set_sudoku(all); break;
-        case GRAYSCALE: set_rotation(all); break;
+        case GRAYSCALE: set_sudoku(all); break;
         case GAUSSIAN_BLUR: set_grayscale(all); break;
         case CANNY: set_gaussian_blur(all); break;
-        case SAVE: set_canny(all); break;
+        case HOUGH: set_canny(all); break;
+        case ROTATION: set_hough(all); break;
+        case SAVE: set_rotation(all); break;
         default: break;
     };
 }
@@ -199,11 +212,12 @@ void on_state_nsb(GtkButton *button, gpointer user_data) // next step button
 
     switch(all->state2) // next
     {
-        case SUDOKU: set_rotation(all); break;
-        case ROTATION: set_grayscale(all); break;
+        case SUDOKU: set_grayscale(all); break;
         case GRAYSCALE: set_gaussian_blur(all); break;
         case GAUSSIAN_BLUR: set_canny(all); break;
-        case CANNY: set_save3(all); break;
+        case CANNY: set_hough(all); break;
+        case HOUGH: set_rotation(all); break;
+        case ROTATION: set_save3(all); break;
         default: break;
     };
 }
@@ -283,11 +297,17 @@ void file_selected_changed(GtkFileChooser *chooser, gpointer user_data)
     sizing_image(pixbuf, all->ui.sudoku_image, 800);
     set_hidden4(all);
 
-    image_process(all->sudoku_file, "--rotation", "0");
-    image_process("Rotation.bmp", "--grayscale", "0");
+    image_process(all->sudoku_file, "--grayscale", "0");
     image_process("Grayscale.bmp", "--gaussian", "0");
     image_process("Gaussian.bmp", "--canny", "0");
-    //image_process("Canny.bmp", "", "0");
+    detection("Canny.bmp", "--hough", "0");
+    image_process("Hough.bmp", "--rotation", "0");
+    image_process("Rotation.bmp", "--blob", "0");
+
+    //avec blob faire fucntion neuro
+    //avec result faire solver
+    //avec result faire delphine
+    //result(char* path);
 
 }
 
@@ -303,6 +323,9 @@ void quit(GtkButton *button, gpointer user_data)
     remove("Rotation.bmp");
     remove("Gaussian.bmp");
     remove("Canny.bmp");
+    remove("Hough.bmp");
+    remove("Blob.bmp");
+
     gtk_main_quit();
 }
 

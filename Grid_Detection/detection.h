@@ -12,3 +12,5 @@ typedef struct vector
     int *data;
 }vector;
 
+int detection(char* path,char* ar,char* angle);
+

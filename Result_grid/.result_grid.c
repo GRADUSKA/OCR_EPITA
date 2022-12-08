@@ -112,8 +112,10 @@ int* upload(char* f_name)
 }
 
 
-int result(char* path)
+int main(int argc, char** argv)
 {
+    if (argc != 2)
+        errx(EXIT_FAILURE, "Usage: image-file");
     SDL_Surface* surface = load_image(argv[1]);
     int* tab = upload("grid.result");
     int* tab2 = upload("grid");

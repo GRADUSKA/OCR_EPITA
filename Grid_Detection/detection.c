@@ -31,6 +31,21 @@ void vector_free(struct vector *v)
     free(v);
 }
 
+void vector_sort(vector* v)
+{
+    for(size_t i =0; i < v->size;i++)
+    {
+        for(size_t j =i; j < v->size-1;j++)
+        {
+            if(v->data[j] > v->data[j+1])
+            {
+                int mem = v->data[j];
+                v->data[j] = v->data[j+1];
+                v->data[j+1] = mem;
+            }
+        }
+    }
+}
 void double_capacity(struct vector *v)
 {
     v->capacity *= 2;
@@ -39,30 +54,14 @@ void double_capacity(struct vector *v)
         errx(1,"Not enough memory!");
 }
 
-size_t find(struct vector *v,int x)
-{
-    size_t i =0;
-    for(;i < v->size && v->data[i] < x;i++)
-        ;
-    if(i == v->size)
-        i -=1;
-    return i;
 
-}
-void vector_insert(struct vector *v, size_t i, int x)
+void vector_push(struct vector *v, int x)
 {
-    if(i < 0 || i > v->size)
-        return;
-    if(i > v->capacity)
+    if(v->size+1 > v->capacity)
         double_capacity(v);
+    v->data[v->size] = x;
     v->size++;
-    for(size_t j = i; j < v->size-1 ;j++)
-    {
-        v->data[j+1] = v->data[j];
-    }
-    v->data[i] = x;
 }
-
 //Deux problemes possibles :
 //1 : je remplis mal mon array
 //2 : j'affiche mal mes lignes
@@ -181,7 +180,7 @@ void drawHoughSpace(SDL_Surface* s,int* array)
 }
 
 
-double get_angles(SDL_Surface* s,int* array)
+int get_angles(SDL_Surface* s,int* array)
 {
     int w_s = s->w;
     int h_s = s->h;
@@ -205,20 +204,29 @@ double get_angles(SDL_Surface* s,int* array)
             if((array[y_tab * w + x_tab]) / ((80 * max)/100) != 0)
             {
                 if((x_tab > 45 && x_tab <= 135) || (x_tab > 225 && x_tab <= 315))
-                    vector_insert(anglesX,find(anglesX,x_tab),x_tab);
+                {
+                    vector_push(anglesX,x_tab);
+                }
                 else
-                    vector_insert(anglesY,find(anglesY,y_tab),y_tab);
+                {
+                    vector_push(anglesY,x_tab);
+
+                }
             }
         }
     }
 
     if(anglesX->size > anglesY->size)
     {
-        return anglesX->data[anglesX->size/2];
+        vector_sort(anglesX);
+        size_t sss = anglesY->size;
+        return 90 - anglesX->data[sss/2];
     }
     else    
     {
-        return anglesY->data[anglesY->size/2];
+        vector_sort(anglesY);
+        size_t sss = anglesY->size;
+        return anglesY->data[sss/2] * -1;
     }
 
 }
@@ -248,19 +256,8 @@ int main(int argc, char** argv)
         int* tab = hough_function(surf);
         drawHoughSpace(surf,tab);
         SDL_SaveBMP(surf,"Hough.bmp");
-        double angle = get_angles(surf,tab);
-        if(angle <0)
-        {
-            angle = (360 - angle);
-            while(angle < 0)
-                angle +=360;
-        }
-        else
-        {
-            while(angle > 360)
-                angle -= 360;
-        }
-
+        int angle = get_angles(surf,tab);
+        printf("angle : %d\n",angle);
         SDL_Surface* res = Rotation_shearing(s,angle);
         SDL_SaveBMP(res,"Rotation.bmp");
     }

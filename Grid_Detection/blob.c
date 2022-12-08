@@ -104,7 +104,7 @@ char is_in_blob_reach(Blob* blob, int t, int x, int y)
 
 Blob* add_blob(Blob_list* blob_list , int x, int y)
 {
-    if (blob_list->size == blob_list->nb_blob)
+    if (blob_list->size == (size_t)blob_list->nb_blob)
     {
         blob_list->size *= 2;
         blob_list->list = realloc(blob_list->list,blob_list->size*sizeof(Blob));

@@ -167,8 +167,8 @@ int main(int argc, char** argv)
 
     size_t *sizes = malloc(sizeof(size_t) * 4); 
     sizes[0] = (size_t) 256;
-    sizes[1] = (size_t) 128;
-    sizes[2] = (size_t) 64;
+    sizes[1] = (size_t) 16;
+    sizes[2] = (size_t) 16;
     sizes[3] = (size_t) 9;
 
     layers **layer_list = malloc(sizeof(layers*) * 4);
@@ -224,11 +224,11 @@ int main(int argc, char** argv)
             strcat(dir_name, k);
             dir = opendir(dir_name);
             size_t image = rand() % input_number;
-            while(image < input_number)
+            for(size_t k = 0;k < image + 3; k++)
             {
                 file = readdir(dir);
                 if(file->d_name[0] != '.')
-                    image++;
+                    k++;
             }
             char file_name[PATH_MAX + 1];
             strcpy(file_name, dir_name);
@@ -237,7 +237,7 @@ int main(int argc, char** argv)
             closedir(dir);
             learn(layer_list, W, expected_outputs, 0.5);
 
-            if(!(i % 500))
+            if(!(i % 100))
             {
                 printf("\n");
                 printf("Input: %lu\n", num + 1);

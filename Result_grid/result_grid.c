@@ -61,7 +61,7 @@ void fill_box(SDL_Surface* s, int w, int h, int len,Uint32* pix,int color,int nu
         for(int j = 0; j < surface->w; j++)
         {
             if (test(pixels_number[i*(surface->w) + j],format) == 0)
-                pix[(h+i)*(s->w) + (w+j)] = SDL_MapRGB(surface->format,color,0,0); 
+                pix[(h+i)*(s->w) + (w+j)] = SDL_MapRGB(surface->format,color,0,0);
         }
     }
     SDL_FreeSurface(surface);
@@ -70,10 +70,10 @@ void fill_box(SDL_Surface* s, int w, int h, int len,Uint32* pix,int color,int nu
 void fill_grid(SDL_Surface* surface,int* tab,int* origin)
 {
     Uint32* pixels = surface->pixels;
-    
+
     if (SDL_LockSurface(surface) != 0)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
-    
+
     SDL_LockSurface(surface);
     int h = (surface->h)/9;
     int w = (surface->w)/9;
@@ -117,10 +117,8 @@ int* upload(char* f_name)
 }
 
 
-int main(int argc, char** argv)
+int result(char* path)
 {
-    if (argc != 2)
-        errx(EXIT_FAILURE, "Usage: image-file");
     SDL_Surface* surface = load_image(argv[1]);
     int* tab = upload("grid.result");
     int* tab2 = upload("grid");

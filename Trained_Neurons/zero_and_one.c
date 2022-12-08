@@ -33,6 +33,30 @@ int which(int c, int surf, int max, Uint32* pixels, SDL_PixelFormat* format, int
     return 0;
 }
 
+void resize(SDL_Surface* surface, Uint32* pixels, SDL_PixelFormat* format, int* base_x, int* base_y, int* max_x, int* max_y)
+{
+    for(int y = 0; y < surface->h; y++)
+    {
+        for(int x = 0; x < surface->w; x++)
+        {
+            Uint8 r, g, b;
+            SDL_GetRGB(pixels[x+surface->w*y], format, &r, &g, &b);
+            if(r < 128 && g < 128 && b < 128)
+            {
+                if(*base_x > x)
+                    *base_x = x;
+                if(*max_x < x)
+                    *max_x = x;
+                if(*base_y > y)
+                    *base_y = y;
+                if(*max_y < y)
+                    *max_y = y;
+            }    
+        }
+    }
+}
+
+
 void zeroandone(SDL_Surface* surface, layers* layer)
 {
     Uint32* pixels = surface->pixels;
@@ -40,13 +64,15 @@ void zeroandone(SDL_Surface* surface, layers* layer)
     {
         errx(EXIT_FAILURE, "%s", SDL_GetError());
     }
-    int base_x = 0;
-    int base_y = 0;
-    int max_x = surface->w;
-    int max_y = surface->h;
-    if(max_x % 2)
+    SDL_PixelFormat* format = surface->format;
+    int base_x = surface->w;
+    int base_y = surface->h;
+    int max_x = 0;
+    int max_y = 0;
+    resize(surface, pixels, format, &base_x, &base_y, &max_x, &max_y);
+    if((max_x-base_x) % 2)
         max_x++;
-    if(max_y % 2)
+    if((max_y-base_y) % 2)
         max_y++;
     for(int alt = 0; (max_x - base_x) % 16; alt = !alt)
     {
@@ -68,7 +94,6 @@ void zeroandone(SDL_Surface* surface, layers* layer)
     int x = width/16;
     int y = height/16;
 
-    SDL_PixelFormat* format = surface->format;
 
     SDL_LockSurface(surface);
 

@@ -69,7 +69,7 @@ int image_process(char* filename, char* a, char* angle)
         }
         SDL_UnlockSurface(s);
         hyperthesis(s);
-        SDL_SaveBMP(s, "ImageProssessing.bmp");
+        SDL_SaveBMP(s, "ImageProcessing.bmp");
 
     }
     else if (strcmp(a, "--rotation") == 0)

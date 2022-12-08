@@ -283,7 +283,7 @@ void apply_blob_crop(SDL_Surface* s)
     Blob* final_blob = merge_blobs(bloblist);
     SDL_Surface* cropped = crop(s,final_blob);
     SDL_FreeSurface(s);
-    SDL_SaveBMP(cropped,"test_blob.bmp");
+    SDL_SaveBMP(cropped,"Blob.bmp");
     SDL_FreeSurface(cropped);
 }
 

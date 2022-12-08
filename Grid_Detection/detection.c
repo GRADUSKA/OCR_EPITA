@@ -257,13 +257,33 @@ int main(int argc, char** argv)
         drawHoughSpace(surf,tab);
         SDL_SaveBMP(surf,"Hough.bmp");
         int angle = get_angles(surf,tab);
-        printf("angle : %d\n",angle);
         SDL_Surface* res = Rotation_shearing(s,angle);
         SDL_SaveBMP(res,"Rotation.bmp");
     }
     else if (strcmp(a,"--blob")==0)
     {
-        apply_blob_crop(s);
+        image_process(argv[1],"--canny","0");
+        SDL_Surface* canny = load_image("Canny.bmp");
+        apply_blob_crop(canny);
+    }
+    else if(strcmp(a,"--all") == 0)
+    {
+        image_process(argv[1],"--all","0");
+        SDL_Surface* surf = load_image("ImageProcessing.bmp");
+        int* tab = hough_function(surf);
+        drawHoughSpace(surf,tab);
+        SDL_SaveBMP(surf,"Hough.bmp");
+        int angle = get_angles(surf,tab);
+        SDL_Surface* res = Rotation_shearing(load_image(argv[1]),angle);
+        SDL_SaveBMP(res,"Rotation.bmp");
+        image_process(argv[1],"--canny","0");
+        SDL_Surface* c = load_image("Canny.bmp");
+        Blob_list* bloblist = generateBlob(c);
+        Blob* final_blob = merge_blobs(bloblist);
+        SDL_Surface* cropped = crop(c,final_blob);
+        SDL_FreeSurface(s);
+        SDL_SaveBMP(cropped,"Blob.bmp");
+        SDL_FreeSurface(cropped);
     }
     else
     {

@@ -49,6 +49,11 @@ void fill_box(SDL_Surface* s, int w, int h, int len,Uint32* pix,int color,int nu
         surface = load_image("Source/7.jpg");
     }
 
+    else if(number == 8)
+    {
+        surface = load_image("Source/9.jpg");
+    }
+
     Uint32* pixels_number = surface->pixels;
     SDL_PixelFormat* format = surface->format;
     for(int i = 0; i < surface->h;i++)

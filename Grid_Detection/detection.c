@@ -1,4 +1,5 @@
-#include "use.h"
+#include "../Image_Processing/use.h"
+#include "../Image_Processing/image_process.h"
 #include "../Image_Processing/rotation.h"
 #include "blob.h"
 #include <stdio.h>
@@ -38,12 +39,28 @@ void double_capacity(struct vector *v)
         errx(1,"Not enough memory!");
 }
 
-void vector_push(struct vector *v, int x)
+size_t find(struct vector *v,int x)
 {
-    if(v->size+1 > v->capacity)
+    size_t i =0;
+    for(;i < v->size && v->data[i] < x;i++)
+        ;
+    if(i == v->size)
+        i -=1;
+    return i;
+
+}
+void vector_insert(struct vector *v, size_t i, int x)
+{
+    if(i < 0 || i > v->size)
+        return;
+    if(i > v->capacity)
         double_capacity(v);
-    v->data[v->size] = x;
     v->size++;
+    for(size_t j = i; j < v->size-1 ;j++)
+    {
+        v->data[j+1] = v->data[j];
+    }
+    v->data[i] = x;
 }
 
 //Deux problemes possibles :
@@ -188,53 +205,68 @@ double get_angles(SDL_Surface* s,int* array)
             if((array[y_tab * w + x_tab]) / ((80 * max)/100) != 0)
             {
                 if((x_tab > 45 && x_tab <= 135) || (x_tab > 225 && x_tab <= 315))
-                    vector_push(anglesX,x_tab);
+                    vector_insert(anglesX,find(anglesX,x_tab),x_tab);
                 else
-                    vector_push(anglesY,x_tab);                   
+                    vector_insert(anglesY,find(anglesY,y_tab),y_tab);
             }
         }
     }
 
-    int res = 0;
     if(anglesX->size > anglesY->size)
     {
-        for(size_t i = 0; i < anglesX->size;i++)
-            res += anglesX->data[i];
-        return res/anglesX->size;
+        return anglesX->data[anglesX->size/2];
     }
     else    
     {
-        for(size_t i = 0; i < anglesY->size;i++)
-            res += anglesY->data[i];
-        return res/anglesY->size;
+        return anglesY->data[anglesY->size/2];
     }
+
 }
 int main(int argc, char** argv)
 {
     // Checks the number of arguments.
-    if (argc != 3)
+    if (argc != 3 && argc != 4)
         errx(EXIT_FAILURE, "Usage: image-file");
     SDL_Surface* s = load_image(argv[1]);
 
     if(s == NULL)
         errx(EXIT_FAILURE,"NOT A GOOD IMAGE");
     char* a = argv[2];
-    if(strcmp(a,"--hough") == 0)
+    if(strcmp(a,"--rotation")==0)
     {
-        int* tab = hough_function(s);
-        drawHoughSpace(s,tab);
-        SDL_SaveBMP(s,"merde.bmp");
-        double angle = get_angles(s,tab);
-        if(angle > 0)
+        if(argc != 4)
+            errx(EXIT_FAILURE,"Put an angle");
+        image_process("test_rotation.png","--canny","0");
+        double a = get_angle(argv[3]);
+        SDL_Surface* res = Rotation_shearing(s,a);
+        SDL_SaveBMP(res,"rota.bmp");
+    }
+    else if(strcmp(a,"--hough") == 0)
+    {
+        image_process(argv[1],"--canny","0");
+        SDL_Surface* surf = load_image("Canny.bmp");
+        int* tab = hough_function(surf);
+        drawHoughSpace(surf,tab);
+        SDL_SaveBMP(surf,"Hough.bmp");
+        double angle = get_angles(surf,tab);
+        if(angle <0)
         {
-            Rotation_shearing(s,angle);
+            angle = (360 - angle);
+            while(angle < 0)
+                angle +=360;
         }
+        else
+        {
+            while(angle > 360)
+                angle -= 360;
+        }
+
+        SDL_Surface* res = Rotation_shearing(s,angle);
+        SDL_SaveBMP(res,"Rotation.bmp");
     }
     else if (strcmp(a,"--blob")==0)
     {
-        printf("a mimir\n");
         apply_blob_crop(s);
-        printf("heu bahe jsp\n");
     }
     else
     {

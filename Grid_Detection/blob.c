@@ -1,4 +1,3 @@
-#include "use.h"
 #include "blob.h"
 Blob* init_blob(int x,int y)
 {

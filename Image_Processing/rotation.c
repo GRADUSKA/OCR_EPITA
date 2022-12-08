@@ -1,6 +1,6 @@
 #include "rotation.h"
 
-inline Uint32 SDL_LirePixel(SDL_Surface* surface, int x, int y)
+Uint32 SDL_LirePixel(SDL_Surface* surface, int x, int y)
 {
     int bpp = surface->format->BytesPerPixel;
     Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
@@ -24,7 +24,7 @@ inline Uint32 SDL_LirePixel(SDL_Surface* surface, int x, int y)
 
 
 /*permet d'écrire un pixel au position x,y*/
-inline void SDL_EcrirePixel(SDL_Surface* surface, int x, int y, Uint32 pixel)
+void SDL_EcrirePixel(SDL_Surface* surface, int x, int y, Uint32 pixel)
 {
     int bpp = surface->format->BytesPerPixel;
     Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;

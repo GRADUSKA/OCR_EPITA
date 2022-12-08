@@ -1,6 +1,8 @@
 #include <err.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "use.h"
 
 int test(Uint32 pixel_color, SDL_PixelFormat* format)
@@ -85,12 +87,39 @@ void fill_grid(SDL_Surface* surface,int* tab,int* origin)
     SDL_UnlockSurface(surface);
 }
 
+int* upload(char* f_name)
+{
+    int* tab = calloc(81,(sizeof(int)));
+    FILE* fichier;
+    int u = 0;
+    fichier = fopen(f_name,"r");
+    for(int i = 0; i < 109; i++)
+    {
+        char c = fgetc(fichier);
+        int j = c-'0';
+        if (j >= 0 && j <= 9)
+        {
+            tab[u] = j;
+            u++;
+        }
+        else if(c == '.')
+        {
+            tab[u] = 0;
+            u++;
+        }
+    }
+    return tab;
+}
+
+
 int main(int argc, char** argv)
 {
     if (argc != 2)
         errx(EXIT_FAILURE, "Usage: image-file");
     SDL_Surface* surface = load_image(argv[1]);
-    //fill_grid(surface,tab,tab2);
+    int* tab = upload("grid.result");
+    int* tab2 = upload("grid");
+    fill_grid(surface,tab,tab2);
     SDL_SaveBMP(surface,"Result_grid.bmp");
     SDL_FreeSurface(surface);
     SDL_Quit();

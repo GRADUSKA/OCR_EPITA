@@ -9,4 +9,4 @@
 #include "zero_and_one.h"
 
 void read_neuron(FILE *file, layers **layer_list, matrix **W);
-size_t (SDL_Surface* surface, layers **layer_list, matrix **W);
+size_t neurons(SDL_Surface* surface, layers **layer_list, matrix **W);

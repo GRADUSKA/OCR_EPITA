@@ -1,9 +1,11 @@
 #include <err.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include "../Trained_Neurons/neural_network.h"
+#include "../Trained_Neurons/neuron_utils.h"
 
 
-void to_case(SDL_Surface* surface, char name[], char where[], int x, int y, int w, int h)
+SDL_Surface* to_case(SDL_Surface* surface, int x, int y, int w, int h)
 {
     // to change : the width and the heigh by the real
     SDL_Surface* new_surface = SDL_CreateRGBSurface(0, w, h, 32, 0, 0, 0, 0);
@@ -36,40 +38,16 @@ void to_case(SDL_Surface* surface, char name[], char where[], int x, int y, int 
         k++;
     }
 
-    int z = 0;
-    char new[12];
-    while(name[z] != '\0')
-    {
-        new[z] = name[z];
-        z++;
-    }
-    new[z] = where[0];
-    z++;
-    new[z] = where[1];
-    z++;
-    new[z] = '.';
-    z++;
-    new[z] = 'b';
-    z++;
-    new[z] = 'm';
-    z++;
-    new[z] = 'p';
-    z++;
-    new[z] = '\0';
-
-
-    SDL_SaveBMP(new_surface, new);
 
     SDL_UnlockSurface(new_surface);
 
-    SDL_FreeSurface(new_surface);
-
     SDL_UnlockSurface(surface);
 
+    return new_surface;
 }
 
 
-SDL_Surface* load_image(const char* path)
+SDL_Surface* load_image1(const char* path)
 {
     SDL_Surface* tmp = IMG_Load(path);
 
@@ -87,15 +65,8 @@ SDL_Surface* load_image(const char* path)
 }
 
 
-int main(int argc, char** argv)
+int boxes(char* path)
 {
-    //argv[1] : name of the image
-    //argv[2] : file with the coordonates
-    if(argc != 2)
-    {
-        errx(EXIT_FAILURE, "Usage: image-file");
-    }
-
     // Initializes the SDL.
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
@@ -112,19 +83,66 @@ int main(int argc, char** argv)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
 
     // - Create a surface.
-    SDL_Surface* surface = load_image(argv[1]);
+    SDL_Surface* surface = load_image1(path);
 
     // - Create a texture from the image.
-    SDL_Texture* texture = IMG_LoadTexture(renderer, argv[1]);
+    SDL_Texture* texture = IMG_LoadTexture(renderer, path);
     if (texture == NULL)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
 
     int w = (surface->w)/9;
     int h = (surface->h)/9;
+    int x = 0;
+    int y = 0;
 
-    to_case(surface, "boxe_", "01", 0, 0, w, h);
-    to_case(surface, "boxe_", "02", (surface->w)/9, 0, w, h);
-    to_case(surface, "boxe_", "03", 0, (surface->h)/9, w, h);
+    size_t *sizes = malloc(sizeof(size_t) * 4);
+    sizes[0] = (size_t) 256;
+    sizes[1] = (size_t) 16;
+    sizes[2] = (size_t) 16;
+    sizes[3] = (size_t) 9;
+
+    layers **layer_list = malloc(sizeof(layers*) * 4);
+    init_layers(layer_list, sizes);
+    matrix **W = malloc(sizeof(matrix*) * 3);
+    init_weights(W, sizes);
+
+    FILE* neuron_file = fopen("digits.txt", "r");
+    if(neuron_file)
+    {
+        read_neuron(neuron_file, layer_list, W);
+        fclose(neuron_file);
+    }
+
+    FILE *fp = fopen("grid", "w");
+    for(size_t i = 0; i < 9; i++)
+    {
+       if(i != 0 && i % 3 == 0)
+       {
+           fputc('\n', fp);
+       }
+        for(size_t j = 0; j < 9; j++)
+        {
+            if(j != 0 && j % 3 == 0)
+            {
+                fputc(' ', fp);
+            }
+            SDL_Surface* surface = to_case(surface, x, y, w, h);
+            int t = test11(surface);
+            if(t > 10)
+            {
+                size_t num = neurons(surface, layer_list, W);
+                fputc(num + '0',fp);
+            }
+            else
+            {
+                fputc('.',fp);
+            }
+            x += w;
+        }
+        y += h;
+        fputc('\n', fp);
+
+    }
 
     // - Free the surface.
     SDL_FreeSurface(surface);

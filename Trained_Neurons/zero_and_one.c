@@ -21,7 +21,6 @@ int which(int c, int surf, int max, Uint32* pixels, SDL_PixelFormat* format, int
                 {
                     noir++;
                 }
-            
             }
         }
     }
@@ -51,9 +50,65 @@ void resize(SDL_Surface* surface, Uint32* pixels, SDL_PixelFormat* format, int* 
                     *base_y = y;
                 if(*max_y < y)
                     *max_y = y;
-            }    
+            }
         }
     }
+}
+
+int test11(SDL_Surface* surface)
+{
+    Uint32* pixels = surface->pixels;
+    if (pixels == NULL)
+    {
+        errx(EXIT_FAILURE, "%s", SDL_GetError());
+    }
+    SDL_PixelFormat* format = surface->format;
+    int base_x = surface->w;
+    int base_y = surface->h;
+    int max_x = 0;
+    int max_y = 0;
+    resize(surface, pixels, format, &base_x, &base_y, &max_x, &max_y);
+    if((max_x-base_x) % 2)
+        max_x++;
+    if((max_y-base_y) % 2)
+        max_y++;
+    for(int alt = 0; (max_x - base_x) % 16; alt = !alt)
+    {
+        if(alt)
+            max_x += 2;
+        else
+            base_x -= 2;
+    }
+    for(int alt = 0; (max_y - base_y) % 16; alt = !alt)
+    {
+        if(alt)
+            max_y += 2;
+        else
+            base_y -= 2;
+    }
+    int width = max_x - base_x;
+    int height = max_y - base_y;
+
+    int x = width/16;
+    int y = height/16;
+
+    int count = 0;
+
+    SDL_LockSurface(surface);
+
+    size_t h = 0;
+    for(int i = base_y; h < 16; i+=y, h++)
+    {
+        size_t w = 0;
+        for(int j = base_x; w < 16; j+=x, w++)
+        {
+            int n = which(i*width+j, width, width*height, pixels, format, x, y);
+            count += n;
+        }
+
+    }
+    SDL_UnlockSurface(surface);
+    return count;
 }
 
 
@@ -115,7 +170,7 @@ void zeroandone(SDL_Surface* surface, layers* layer)
 // The format of the surface is SDL_PIXELFORMAT_RGB888.
 //
 // path: Path of the image.
-SDL_Surface* load_image(const char* path)
+SDL_Surface* load_image2(const char* path)
 {
     SDL_Surface* temp = IMG_Load(path);
     if (temp == NULL)
@@ -147,7 +202,7 @@ void transform(const char* path, layers* layer)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
 
     // - Create a surface from the colored image.
-    SDL_Surface* surface = load_image(path);
+    SDL_Surface* surface = load_image2(path);
 
     // - Create a texture from the image.
     SDL_Texture* texture = IMG_LoadTexture(renderer, path);

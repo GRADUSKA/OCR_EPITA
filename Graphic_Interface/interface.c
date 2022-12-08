@@ -3,6 +3,8 @@
 #include "../Image_Processing/image_process.h"
 #include "../Grid_Detection/detection.h"
 #include "../Result_grid/result_grid.h"
+#include "../Solver/solver.h"
+#include "../Boxes_cutting/boxes.h"
 
 typedef enum Save
 {
@@ -303,12 +305,9 @@ void file_selected_changed(GtkFileChooser *chooser, gpointer user_data)
     detection("Canny.bmp", "--hough", "0");
     image_process("Hough.bmp", "--rotation", "0");
     image_process("Rotation.bmp", "--blob", "0");
-
-    //avec blob faire fucntion neuro
-    //avec result faire solver
-    //avec result faire delphine
-    //result(char* path);
-
+    boxes("Blob.bmp");
+    solver1("grid");
+    result();
 }
 
 void quit(GtkButton *button, gpointer user_data)
@@ -325,6 +324,8 @@ void quit(GtkButton *button, gpointer user_data)
     remove("Canny.bmp");
     remove("Hough.bmp");
     remove("Blob.bmp");
+    remove("grid");
+    remove("grid.result");
 
     gtk_main_quit();
 }

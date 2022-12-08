@@ -35,7 +35,6 @@ int is_possible(char sudoku[], int i, int j, char value)
         }
     }
     return 1; //the placement is possible !!!
-    
 }
 
 
@@ -140,15 +139,8 @@ void file_result(char *name, char sudoku[])
 }
 
 
-int main(int argc, char *argv[])
+int solver1(char* name)
 {
-    if(argc != 2)
-    {
-        printf("probleme argc\n");
-        return 1;
-    }
-
-    char *name = argv[1];
     char sudoku[81];
 
     fill_sudoku(name, sudoku);

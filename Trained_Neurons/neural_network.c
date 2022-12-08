@@ -73,32 +73,12 @@ void read_neuron(FILE *file, layers **layer_list, matrix **W)
     }
 }
 
-size_t (SDL_Surface *surface, layers **layer_list, matrix **W)
+size_t neurons(SDL_Surface *surface, layers **layer_list, matrix **W)
 {
-    srand(time(NULL));
-
-    size_t *sizes = malloc(sizeof(size_t) * 4); 
-    sizes[0] = (size_t) 256;
-    sizes[1] = (size_t) 16;
-    sizes[2] = (size_t) 16;
-    sizes[3] = (size_t) 9;
-
-    layers **layer_list = malloc(sizeof(layers*) * 4);
-    init_layers(layer_list, sizes);
-    matrix **W = malloc(sizeof(matrix*) * 3);
-    init_weights(W, sizes);
-
-    FILE* neuron_file = fopen("digits.txt", "r");
-    if(neuron_file)
-    {
-        read_neuron(neuron_file, layer_list, W);
-        fclose(neuron_file);
-    }
-
     zeroandone(surface, layer_list[0]);
     compute(layer_list, W);
     size_t max = 0;
-    for(size_t i = 1; i < sizes[3]; i++)
+    for(size_t i = 1; i < 9; i++)
        if(layer_list[3]->neurons[i] > layer_list[3]->neurons[max])
             max = i;
     return max + 1;

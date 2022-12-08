@@ -117,13 +117,13 @@ int* upload(char* f_name)
 }
 
 
-int result(char* path)
+int result()
 {
-    SDL_Surface* surface = load_image(argv[1]);
-    int* tab = upload("grid.result");
-    int* tab2 = upload("grid");
+    SDL_Surface* surface = load_image("../Boxes_cutting/sudoku.png");
+    int* tab = upload("../grid.result");
+    int* tab2 = upload("../grid");
     fill_grid(surface,tab,tab2);
-    SDL_SaveBMP(surface,"Result_grid.bmp");
+    SDL_SaveBMP(surface,"Solved.bmp");
     SDL_FreeSurface(surface);
     SDL_Quit();
 

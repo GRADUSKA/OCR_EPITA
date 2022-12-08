@@ -1,17 +1,4 @@
-#include "../Image_Processing/use.h"
-#include "../Image_Processing/image_process.h"
-#include "../Image_Processing/rotation.h"
-#include "blob.h"
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-typedef struct vector
-{
-    size_t capacity;
-    size_t size;
-    int *data;
-}vector;
-
+#include "detection.h"
 struct vector *vector_new()
 {
     struct vector *viktor = malloc(sizeof(struct vector));
@@ -230,28 +217,23 @@ int get_angles(SDL_Surface* s,int* array)
     }
 
 }
-int main(int argc, char** argv)
+int detection(char* path,char* ar,char* angle)
 {
     // Checks the number of arguments.
-    if (argc != 3 && argc != 4)
-        errx(EXIT_FAILURE, "Usage: image-file");
-    SDL_Surface* s = load_image(argv[1]);
+    SDL_Surface* s = load_image(path);
 
     if(s == NULL)
         errx(EXIT_FAILURE,"NOT A GOOD IMAGE");
-    char* a = argv[2];
-    if(strcmp(a,"--rotation")==0)
+    if(strcmp(ar,"--rotation")==0)
     {
-        if(argc != 4)
-            errx(EXIT_FAILURE,"Put an angle");
         image_process("test_rotation.png","--canny","0");
-        double a = get_angle(argv[3]);
+        double a = get_angle(angle);
         SDL_Surface* res = Rotation_shearing(s,a);
         SDL_SaveBMP(res,"rota.bmp");
     }
-    else if(strcmp(a,"--hough") == 0)
+    else if(strcmp(ar,"--hough") == 0)
     {
-        image_process(argv[1],"--canny","0");
+        image_process(path,"--canny","0");
         SDL_Surface* surf = load_image("Canny.bmp");
         int* tab = hough_function(surf);
         drawHoughSpace(surf,tab);
@@ -260,23 +242,23 @@ int main(int argc, char** argv)
         SDL_Surface* res = Rotation_shearing(s,angle);
         SDL_SaveBMP(res,"Rotation.bmp");
     }
-    else if (strcmp(a,"--blob")==0)
+    else if (strcmp(ar,"--blob")==0)
     {
-        image_process(argv[1],"--canny","0");
+        image_process(path,"--canny","0");
         SDL_Surface* canny = load_image("Canny.bmp");
         apply_blob_crop(canny);
     }
-    else if(strcmp(a,"--all") == 0)
+    else if(strcmp(ar,"--all") == 0)
     {
-        image_process(argv[1],"--all","0");
+        image_process(path,"--all","0");
         SDL_Surface* surf = load_image("ImageProcessing.bmp");
         int* tab = hough_function(surf);
         drawHoughSpace(surf,tab);
         SDL_SaveBMP(surf,"Hough.bmp");
         int angle = get_angles(surf,tab);
-        SDL_Surface* res = Rotation_shearing(load_image(argv[1]),angle);
+        SDL_Surface* res = Rotation_shearing(load_image(path),angle);
         SDL_SaveBMP(res,"Rotation.bmp");
-        image_process(argv[1],"--canny","0");
+        image_process(path,"--canny","0");
         SDL_Surface* c = load_image("Canny.bmp");
         Blob_list* bloblist = generateBlob(c);
         Blob* final_blob = merge_blobs(bloblist);

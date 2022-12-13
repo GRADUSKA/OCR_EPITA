@@ -303,8 +303,9 @@ void file_selected_changed(GtkFileChooser *chooser, gpointer user_data)
     image_process("Grayscale.bmp", "--gaussian", "0");
     image_process("Gaussian.bmp", "--canny", "0");
     detection("Canny.bmp", "--hough", "0");
-    image_process("Hough.bmp", "--rotation", "0");
-    image_process("Rotation.bmp", "--blob", "0");
+    detection("Hough.bmp", "--rotation", "0");
+    detection("Rotation.bmp", "--blob", "0");
+    detection(all->sudoku_file,"--all","0");
     boxes("Blob.bmp");
     solver1("grid");
     result();

@@ -24,4 +24,5 @@ ${EXE}: ${OBJ}
 clean:
 	${RM} ${OBJ}
 	${RM} ${EXE}
+	${RM} *.bmp
 # END

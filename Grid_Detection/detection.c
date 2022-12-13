@@ -226,7 +226,7 @@ int detection(char* path,char* ar,char* angle)
         errx(EXIT_FAILURE,"NOT A GOOD IMAGE");
     if(strcmp(ar,"--rotation")==0)
     {
-        image_process("test_rotation.png","--canny","0");
+        image_process(path,"--canny","0");
         double a = get_angle(angle);
         SDL_Surface* res = Rotation_shearing(s,a);
         SDL_SaveBMP(res,"rota.bmp");
